@@ -71,7 +71,7 @@ If you use Tempo-CNN in your work, please consider citing it:
 
 .. code-block:: latex
 
-   @inproceedings{madmom,
+   @inproceedings{
       Title = {{A single-step approach to musical meter estimation using a convolutional neural network}},
       Author = {Schreiber, Hendrik and M{\"u}ller Meinard},
       Booktitle = {Proceedings of the 19th International Society for Music Information Retrieval Conference ({ISMIR})},
