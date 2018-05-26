@@ -88,7 +88,8 @@ References
     a convolutional neural network <http://www.tagtraum.com/download/2018_schreiber_tempo_cnn.pdf>`_
     Proceedings of the 19th International Society for Music Information
     Retrieval Conference (ISMIR), Paris, France, Sept. 2018.
-.. [2] Hendrik Schreiber, *Technical Report: Tempo and Meter Estimation for
-    Greek Folk Music Using Convolutional Neural Networks and Transfer Learning*
+.. [2] Hendrik Schreiber, `Technical Report: Tempo and Meter Estimation for
+    Greek Folk Music Using Convolutional Neural Networks and Transfer Learning
+    <http://www.tagtraum.com/download/2018_SchreiberGreekFolkTempoMeter.pdf>`_
     Proceedings of the 8th International Workshop on Folk Music Analysis (FMA),
     Thessaloniki, Greece, June 2018.
