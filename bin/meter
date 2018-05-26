@@ -33,7 +33,7 @@ def main():
     Hendrik Schreiber,
     "Technical Report: Tempo and Meter Estimation for Greek Folk Music Using
     Convolutional Neural Networks and Transfer Learning"
-    Proceedings of the 8th International Workshop on Folk Music Analysis (FMA),
+    8th International Workshop on Folk Music Analysis (FMA),
     Thessaloniki, Greece, June 2018.
     
     License: GNU Affero General Public License v3
