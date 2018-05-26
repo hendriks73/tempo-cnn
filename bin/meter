@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+meter estimator
+"""
+
+import argparse
+import sys
+
+from tempocnn.classifier import MeterClassifier
+from tempocnn.feature import read_features
+
+
+def main():
+    """meter"""
+
+    # define parser
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter, description='''
+    The program 'meter' estimates the numerator of a global meter for a given file.
+    The used model is based on an approach described in detail in:
+    
+    Hendrik Schreiber, Meinard Müller,
+    "A single-step approach to musical meter estimation using a
+    convolutional neural network"
+    Proceedings of the 19th International Society for Music Information
+    Retrieval Conference (ISMIR), Paris, France, Sept. 2018.
+    
+    For the purpose of estimating meter and tempo for Greek folk music,
+    transfer learning on a small dataset was conducted.
+    For details see:
+
+    Hendrik Schreiber,
+    "Technical Report: Tempo and Meter Estimation for Greek Folk Music Using
+    Convolutional Neural Networks and Transfer Learning"
+    Proceedings of the 8th International Workshop on Folk Music Analysis (FMA),
+    Thessaloniki, Greece, June 2018.
+    
+    License: GNU Affero General Public License v3
+    ''')
+
+    parser.add_argument('-v', '--version', action='version', version='meter 0.0.1')
+    parser.add_argument('-m', '--model', nargs='?', default='fcn',
+                        help='model name [fma2018-meter], defaults to fma2018-meter')
+    parser.add_argument('-i', '--input', nargs='+', help='input audio file(s) to process')
+
+    output_options = parser.add_mutually_exclusive_group()
+    output_options.add_argument('-o', '--output', nargs='*', help='output file(s)')
+    output_options.add_argument('-e', '--extension', help='append given extension to original file name for results')
+
+    # parse arguments
+    args = parser.parse_args()
+
+    if args.output is not None and len(args.output) > 0 and len(args.input) != len(args.output):
+        print('Number of input files must match number of output files.', file=sys.stderr)
+        parser.print_help(file=sys.stderr)
+        sys.exit(1)
+
+    if args.input is None:
+        print('No input files given.', file=sys.stderr)
+        parser.print_help(file=sys.stderr)
+        sys.exit(1)
+
+    # load model
+    print('Loading model...')
+    classifier = MeterClassifier(args.model)
+
+    print('Processing file(s)', end='', flush=True)
+    for index, input_file in enumerate(args.input):
+        print('.', end='', flush=True)
+        features = read_features(input_file, frames=512)
+        meter = classifier.estimate_meter(features)
+        result = str(meter)
+
+        output_file = None
+        if args.extension is not None:
+            output_file = input_file + args.extension
+        elif args.output is not None and index < len(args.output):
+            output_file = args.output[index]
+
+        if output_file is None:
+            print('\n' + result)
+        else:
+            with open(output_file, mode='w') as f:
+                f.write(result + '\n')
+    print('\nDone')
+
+if __name__ == '__main__':
+    main()

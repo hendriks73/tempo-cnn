@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+tempogram generator
+"""
+
+import argparse
+
+import matplotlib.pyplot as plt
+from matplotlib.ticker import ScalarFormatter
+
+from tempocnn.classifier import TempoClassifier
+from tempocnn.feature import read_features
+
+
+def main():
+    """tempogram"""
+
+    # define parser
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter, description='''
+    The program 'tempogram' estimates local tempi for a given file and displays
+    their probability distributions in a graph. 
+    The underlying algorithm is described in detail in:
+
+    Hendrik Schreiber, Meinard Müller,
+    "A single-step approach to musical meter estimation using a
+    convolutional neural network"
+    Proceedings of the 19th International Society for Music Information
+    Retrieval Conference (ISMIR), Paris, France, Sept. 2018.
+    
+    License: GNU Affero General Public License v3
+    ''')
+
+    parser.add_argument('-v', '--version', action='version', version='tempogram 0.0.1')
+    parser.add_argument('-p', '--png',
+                        help='write the tempogram to a file, adding the file extension .png to the input file name',
+                        action="store_true")
+    parser.add_argument('-m', '--model', nargs='?', default='fcn',
+                        help='model name (ismir2018|fma2018|cnn|fcn), defaults to fcn')
+    parser.add_argument('audio_file', nargs='+', help='audio file to process')
+
+    # parse arguments
+    args = parser.parse_args()
+
+    # load model
+    print('Loading model...')
+    classifier = TempoClassifier(args.model)
+
+    hop_length = 32
+    sr = 11025.0
+    fft_hop_length = 512.0
+    log_scale = 'fma' in args.model
+    if log_scale:
+        min_bpm = 50
+        max_bpm = 500
+    else:
+        min_bpm = 30
+        max_bpm = 286
+
+    print('Processing file(s)', end='', flush=True)
+    for file in args.audio_file:
+        print('.', end='', flush=True)
+        features = read_features(file, hop_length=hop_length, zero_pad=True)
+        predictions = classifier.estimate(features)
+
+        max_windows = predictions.shape[0] * hop_length
+        max_length_in_s = max_windows * (fft_hop_length / sr)
+
+        fig = plt.figure()
+        fig.canvas.set_window_title('tempogram: ' + file)
+        if args.png:
+            fig.set_size_inches(5, 2)
+        ax = fig.add_subplot(111)
+        ax.imshow(predictions.T, origin='lower', cmap='Greys', aspect='auto',
+                  extent=(0, max_length_in_s, min_bpm, max_bpm))
+        if log_scale:
+            ax.set_yscale('log')
+            ax.yaxis.set_major_formatter(ScalarFormatter())
+            ax.yaxis.set_minor_formatter(ScalarFormatter())
+
+        ax.set_xlabel('Time in seconds')
+        ax.set_ylabel('Tempo in BPM')
+        if args.png:
+            plt.tight_layout()
+            fig.savefig(file + '.png', dpi=300)
+        else:
+            plt.show()
+
+    print('\nDone')
+
+
+if __name__ == '__main__':
+    main()
