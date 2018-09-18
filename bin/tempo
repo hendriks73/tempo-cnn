@@ -53,7 +53,8 @@ def main():
     args = parser.parse_args()
 
     if args.output is not None and len(args.output) > 0 and len(args.input) != len(args.output):
-        print('Number of input files must match number of output files.', file=sys.stderr)
+        print('Number of input files ({}) must match number of output files ({}).\nInput={}\nOutput={}'
+              .format(len(args.input), len(args.output), args.input, args.output), file=sys.stderr)
         parser.print_help(file=sys.stderr)
         sys.exit(1)
 
