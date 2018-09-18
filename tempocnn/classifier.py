@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import sys
 import os
 import numpy as np
 import pkgutil
@@ -30,7 +31,12 @@ class TempoClassifier:
             self._to_bpm = lambda index: index + 30
         self.model_name = model_name
         resource = _to_model_resource(model_name)
-        file = _extract_from_package(resource)
+        try:
+            file = _extract_from_package(resource)
+        except Exception as e:
+            print('Failed to find a model named \'{}\'. Please check the model name.'.format(model_name),
+                  file=sys.stderr)
+            raise e
         try:
             self.model = load_model(file)
         finally:
@@ -134,7 +140,12 @@ class MeterClassifier:
         self._to_meter = lambda index: index + 2
         self.model_name = model_name
         resource = _to_model_resource(model_name)
-        file = _extract_from_package(resource)
+        try:
+            file = _extract_from_package(resource)
+        except Exception as e:
+            print('Failed to find a model named \'{}\'. Please check the model name.'.format(model_name),
+                  file=sys.stderr)
+            raise e
         try:
             self.model = load_model(file)
         finally:
