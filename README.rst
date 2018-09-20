@@ -72,9 +72,10 @@ If you use Tempo-CNN in your work, please consider citing it:
 .. code-block:: latex
 
    @inproceedings{
-      Title = {{A single-step approach to musical meter estimation using a convolutional neural network}},
+      Title = {A Single-Step Approach to Musical Tempo Estimation Using a Convolutional Neural Network},
       Author = {Schreiber, Hendrik and M{\"u}ller Meinard},
       Booktitle = {Proceedings of the 19th International Society for Music Information Retrieval Conference ({ISMIR})},
+      Pages = {98--105},
       Month = {9},
       Year = {2018},
       Address = {Paris, France}
@@ -84,8 +85,8 @@ If you use Tempo-CNN in your work, please consider citing it:
 References
 ==========
 
-.. [1] Hendrik Schreiber, Meinard Müller, `A single-step approach to musical meter estimation using
-    a convolutional neural network <http://www.tagtraum.com/download/2018_schreiber_tempo_cnn.pdf>`_
+.. [1] Hendrik Schreiber, Meinard Müller, `A Single-Step Approach to Musical Tempo Estimation
+    Using a Convolutional Neural Network <http://ismir2018.ircam.fr/doc/pdfs/141_Paper.pdf>`_
     Proceedings of the 19th International Society for Music Information
     Retrieval Conference (ISMIR), Paris, France, Sept. 2018.
 .. [2] Hendrik Schreiber, `Technical Report: Tempo and Meter Estimation for
