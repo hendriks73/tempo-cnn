@@ -32,7 +32,7 @@ def main():
     License: GNU Affero General Public License v3
     ''')
 
-    parser.add_argument('-v', '--version', action='version', version='tempogram 0.0.1')
+    parser.add_argument('-v', '--version', action='version', version='tempogram 0.0.2')
     parser.add_argument('-p', '--png',
                         help='write the tempogram to a file, adding the file extension .png to the input file name',
                         action="store_true")

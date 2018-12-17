@@ -5,8 +5,8 @@ tempo estimator
 """
 
 import argparse
-import os
 import sys
+from os.path import splitext, dirname, basename, join, normpath
 
 import jams
 import librosa
@@ -33,7 +33,7 @@ def main():
     License: GNU Affero General Public License v3
     ''')
 
-    parser.add_argument('-v', '--version', action='version', version='tempo 0.0.1')
+    parser.add_argument('-v', '--version', action='version', version='tempo 0.0.2')
     parser.add_argument('-m', '--model', nargs='?', default='fcn',
                         help='model name [ismir2018|fma2018|cnn|fcn], defaults to fcn')
     output_format = parser.add_mutually_exclusive_group()
@@ -46,7 +46,9 @@ def main():
     parser.add_argument('-i', '--input', nargs='+', help='input audio file(s) to process')
 
     output_options = parser.add_mutually_exclusive_group()
-    output_options.add_argument('-o', '--output', nargs='*', help='output file(s)')
+    output_location = parser.add_mutually_exclusive_group()
+    output_location.add_argument('-o', '--output', nargs='*', help='output file(s)')
+    output_location.add_argument('-d', '--outputdir', help='output directory')
     output_options.add_argument('-e', '--extension', help='append given extension to original file name for results')
 
     # parse arguments
@@ -81,10 +83,11 @@ def main():
                 y, sr = librosa.load(input_file)
                 track_duration = librosa.get_duration(y=y, sr=sr)
                 result.file_metadata.duration = track_duration
-                result.file_metadata.identifiers = {'file': input_file}
+                result.file_metadata.identifiers = {'file': basename(input_file)}
                 tempo_a = jams.Annotation(namespace='tempo', time=0, duration=track_duration)
-                tempo_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.1',
-                                                                      data_source='schreiber tempo-cnn (model=' + args.model + ')',)
+                tempo_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.2',
+                                                                      annotation_tools='schreiber tempo-cnn (model=' + args.model + '), https://github.com/hendriks73/tempo-cnn',
+                                                                      data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to Musical Tempo Estimation Using a Convolutional Neural Network. In Proceedings of the 19th International Society for Music Information Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
                 tempo_a.append(time=0.0,
                                duration=track_duration,
                                value=t1,
@@ -99,22 +102,27 @@ def main():
             result = str(tempo)
 
         output_file = None
+        file_dir = dirname(input_file)
+        file_name = basename(input_file)
+        if args.outputdir is not None:
+            file_dir = args.outputdir
         if args.jams:
-            filename, file_extension = os.path.splitext(input_file)
-            output_file = filename + '.jams'
+            base, file_extension = splitext(file_name)
+            output_file = join(file_dir, base + '.jams')
         elif args.extension is not None:
-            output_file = input_file + args.extension
+            output_file = join(file_dir, file_name + args.extension)
         elif args.output is not None and index < len(args.output):
             output_file = args.output[index]
-
         if args.jams:
+            print('Trying to save {}'.format(output_file))
             result.save(output_file)
         elif output_file is None:
             print('\n' + result)
         else:
-            with open(output_file, mode='w') as f:
-                f.write(result + '\n')
+            with open(output_file, mode='w') as file_name:
+                file_name.write(result + '\n')
     print('\nDone')
+
 
 if __name__ == '__main__':
     main()
