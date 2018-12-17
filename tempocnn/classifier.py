@@ -6,10 +6,7 @@ import numpy as np
 import pkgutil
 import tempfile
 
-# works with TF 1.3, but for some reason not
-# with TF 1.4 or later (even when import paths are fixed)
-# symptom is: always the same prediction. Odd.
-from tensorflow.contrib.keras.api.keras.models import load_model
+from tensorflow.python.keras.models import load_model
 
 
 class TempoClassifier:
