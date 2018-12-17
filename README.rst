@@ -25,6 +25,16 @@ paper [1], please run
 
     tempo -m ismir2018 --jams -i my_audio.wav
 
+For batch processing, you may want to run ``tempo`` like this:
+
+.. code-block:: console
+
+    find /your_audio_dir/ -name '*.wav' | xargs tempo -d /output_dir/ -i
+
+This will recursively search for all ``.wav`` files in ``/your_audio_dir/``, analyze then
+and write the results to individual files in ``/output_dir/``. Because the model is only
+loaded once, this method of processing is much faster than individual program starts.
+
 Instead of estimating a global tempo, Tempo-CNN can also estimate local tempi in the
 form of a tempogram. This can be useful for identifying tempo drift.
 To create such a tempogram, run
