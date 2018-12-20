@@ -114,7 +114,6 @@ def main():
         elif args.output is not None and index < len(args.output):
             output_file = args.output[index]
         if args.jams:
-            print('Trying to save {}'.format(output_file))
             result.save(output_file)
         elif output_file is None:
             print('\n' + result)
