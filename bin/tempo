@@ -6,7 +6,7 @@ tempo estimator
 
 import argparse
 import sys
-from os.path import splitext, dirname, basename, join, normpath
+from os.path import splitext, dirname, basename, join
 
 import jams
 import librosa
@@ -71,55 +71,58 @@ def main():
 
     print('Processing file(s)', end='', flush=True)
     for index, input_file in enumerate(args.input):
-        print('.', end='', flush=True)
-        features = read_features(input_file)
+        try:
+            print('.', end='', flush=True)
+            features = read_features(input_file)
 
-        if args.mirex or args.jams:
-            t1, t2, s1 = classifier.estimate_mirex(features)
-            if args.mirex:
-                result = str(t1) + '\t' + str(t2) + '\t' + str(s1)
+            if args.mirex or args.jams:
+                t1, t2, s1 = classifier.estimate_mirex(features)
+                if args.mirex:
+                    result = str(t1) + '\t' + str(t2) + '\t' + str(s1)
+                else:
+                    result = jams.JAMS()
+                    y, sr = librosa.load(input_file)
+                    track_duration = librosa.get_duration(y=y, sr=sr)
+                    result.file_metadata.duration = track_duration
+                    result.file_metadata.identifiers = {'file': basename(input_file)}
+                    tempo_a = jams.Annotation(namespace='tempo', time=0, duration=track_duration)
+                    tempo_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.2',
+                                                                          annotation_tools='schreiber tempo-cnn (model=' + args.model + '), https://github.com/hendriks73/tempo-cnn',
+                                                                          data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to Musical Tempo Estimation Using a Convolutional Neural Network. In Proceedings of the 19th International Society for Music Information Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
+                    tempo_a.append(time=0.0,
+                                   duration=track_duration,
+                                   value=t1,
+                                   confidence=s1)
+                    tempo_a.append(time=0.0,
+                                   duration=track_duration,
+                                   value=t2,
+                                   confidence=(1-s1))
+                    result.annotations.append(tempo_a)
             else:
-                result = jams.JAMS()
-                y, sr = librosa.load(input_file)
-                track_duration = librosa.get_duration(y=y, sr=sr)
-                result.file_metadata.duration = track_duration
-                result.file_metadata.identifiers = {'file': basename(input_file)}
-                tempo_a = jams.Annotation(namespace='tempo', time=0, duration=track_duration)
-                tempo_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.2',
-                                                                      annotation_tools='schreiber tempo-cnn (model=' + args.model + '), https://github.com/hendriks73/tempo-cnn',
-                                                                      data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to Musical Tempo Estimation Using a Convolutional Neural Network. In Proceedings of the 19th International Society for Music Information Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
-                tempo_a.append(time=0.0,
-                               duration=track_duration,
-                               value=t1,
-                               confidence=s1)
-                tempo_a.append(time=0.0,
-                               duration=track_duration,
-                               value=t2,
-                               confidence=(1-s1))
-                result.annotations.append(tempo_a)
-        else:
-            tempo = classifier.estimate_tempo(features)
-            result = str(tempo)
+                tempo = classifier.estimate_tempo(features)
+                result = str(tempo)
 
-        output_file = None
-        file_dir = dirname(input_file)
-        file_name = basename(input_file)
-        if args.outputdir is not None:
-            file_dir = args.outputdir
-        if args.jams:
-            base, file_extension = splitext(file_name)
-            output_file = join(file_dir, base + '.jams')
-        elif args.extension is not None:
-            output_file = join(file_dir, file_name + args.extension)
-        elif args.output is not None and index < len(args.output):
-            output_file = args.output[index]
-        if args.jams:
-            result.save(output_file)
-        elif output_file is None:
-            print('\n' + result)
-        else:
-            with open(output_file, mode='w') as file_name:
-                file_name.write(result + '\n')
+            output_file = None
+            file_dir = dirname(input_file)
+            file_name = basename(input_file)
+            if args.outputdir is not None:
+                file_dir = args.outputdir
+            if args.jams:
+                base, file_extension = splitext(file_name)
+                output_file = join(file_dir, base + '.jams')
+            elif args.extension is not None:
+                output_file = join(file_dir, file_name + args.extension)
+            elif args.output is not None and index < len(args.output):
+                output_file = args.output[index]
+            if args.jams:
+                result.save(output_file)
+            elif output_file is None:
+                print('\n' + result)
+            else:
+                with open(output_file, mode='w') as file_name:
+                    file_name.write(result + '\n')
+        except Exception as e:
+            print('\nAn error occurred while processing \'{}\':\n{}'.format(input_file, e), file=sys.stderr)
     print('\nDone')
 
 
