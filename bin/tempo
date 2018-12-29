@@ -122,7 +122,7 @@ def main():
                 with open(output_file, mode='w') as file_name:
                     file_name.write(result + '\n')
         except Exception as e:
-            print('\nAn error occurred while processing \'{}\':\n{}'.format(input_file, e), file=sys.stderr)
+            print('\nAn error occurred while processing \'{}\':\n{}\n'.format(input_file, e), file=sys.stderr)
     print('\nDone')
 
 
