@@ -36,7 +36,7 @@ and write the results to individual files in ``/output_dir/``. Because the model
 loaded once, this method of processing is much faster than individual program starts.
 
 To increase accuracy for greater than integer-precision, you may want to enable quadratic interpolation.
-You can do so by setting the ``--interpolate`` flag. Obviously, this only makes sense for tracks that
+You can do so by setting the ``--interpolate`` flag. Obviously, this only makes sense for tracks
 with a very stable tempo:
 
 .. code-block:: console
