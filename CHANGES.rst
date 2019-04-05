@@ -2,8 +2,12 @@
 Changes
 =======
 
+0.0.3:
+ - Added flag ``--interpolate`` for ``tempo`` to increase accuracy.
+ - Migrated models to TensorFlow 1.10.1.
+
 0.0.2:
- - Added -d option for improved batch processing (tempo)
+ - Added ``-d`` option for improved batch processing (tempo)
  - Improved jams output
  - Moved to librosa 0.6.2
  - Continue processing batch, even when encountering an error

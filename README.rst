@@ -35,6 +35,14 @@ This will recursively search for all ``.wav`` files in ``/your_audio_dir/``, ana
 and write the results to individual files in ``/output_dir/``. Because the model is only
 loaded once, this method of processing is much faster than individual program starts.
 
+To increase accuracy for greater than integer-precision, you may want to enable quadratic interpolation.
+You can do so by setting the ``--interpolate`` flag. Obviously, this only makes sense for tracks that
+with a very stable tempo:
+
+.. code-block:: console
+
+    tempo -m ismir2018 --interpolate -i my_audio.wav
+
 Instead of estimating a global tempo, Tempo-CNN can also estimate local tempi in the
 form of a tempogram. This can be useful for identifying tempo drift.
 To create such a tempogram, run
@@ -66,6 +74,7 @@ Clone this repo and run ``setup.py install`` using Python 3.6:
     cd tempo-cnn
     python setup.py install
 
+You may need to install TensorFlow using ``pip`` from the command line.
 
 License
 =======

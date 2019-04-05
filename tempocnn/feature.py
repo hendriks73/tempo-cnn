@@ -74,5 +74,3 @@ def _to_sliding_window(data, window_length, hop_length):
         window /= m
         windowed_data.append(window)
     return np.concatenate(windowed_data, axis=0)
-
-

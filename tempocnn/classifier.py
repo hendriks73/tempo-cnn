@@ -1,15 +1,12 @@
 # encoding: utf-8
 
-import sys
 import os
-import numpy as np
 import pkgutil
+import sys
 import tempfile
 
-# works with TF 1.3, but for some reason not
-# with TF 1.4 or later (even when import paths are fixed)
-# symptom is: always the same prediction. Odd.
-from tensorflow.contrib.keras.api.keras.models import load_model
+import numpy as np
+from tensorflow.python.keras.models import load_model
 
 
 class TempoClassifier:
@@ -56,35 +53,81 @@ class TempoClassifier:
         assert data.shape[3] == 1, 'Fourth dim of data must be 1. Actual shape was ' + str(data.shape)
         return self.model.predict(data, data.shape[0])
 
-    def estimate_tempo(self, data):
+    @staticmethod
+    def quad_interpol_argmax(y, x=None):
+        """
+        Find argmax for quadratic interpolation around argmax of y.
+
+        :param x: x corresponding to (a) peak in y, if not set, ``np.argmax(y)`` is used
+        :param y: array
+        :return: float (index) of interpolated max, strength
+        """
+        if x is None:
+            x = np.argmax(y)
+        if x == 0 or x == y.shape[0] - 1:
+            return x, y[x]
+        z = np.polyfit([x - 1, x, x + 1], [y[x - 1], y[x], y[x + 1]], 2)
+        # find (float) x value for max
+        argmax = -z[1] / (2. * z[0])
+        height = z[2] - (z[1] ** 2.) / (4. * z[0])
+        return argmax, height
+
+    def estimate_tempo(self, data, interpolate=False):
         """
         Estimates the pre-dominant global tempo.
 
         :param data: features
+        :param interpolate: if ``True``, compute prediction for each window, average predictions
+        and then find the max value via quadratic interpolation.
         :return: a single tempo
         """
         prediction = self.estimate(data)
         averaged_prediction = np.average(prediction, axis=0)
-        index = np.argmax(averaged_prediction)
+        if interpolate:
+            index, _ = self.quad_interpol_argmax(averaged_prediction)
+        else:
+            index = np.argmax(averaged_prediction)
         return self._to_bpm(index)
 
-    def estimate_mirex(self, data):
+    def estimate_mirex(self, data, interpolate=False):
         """
         Estimates the two dominant tempi along with a salience value.
 
         :param data: features
+        :param interpolate: if ``True``, compute prediction for each window, find (float) max value
+        via quadratic interpolation around the regular max and compute the median for the found values
         :return: tempo1, tempo2, salience of tempo1
         """
+
         prediction = self.estimate(data)
+
+        def find_index_peaks(distribution):
+            p = []
+            last_index = 0
+            for index in range(256):
+                height = distribution[index]
+                start = max(index - 5, 0)
+                length = min(11, distribution.shape[0] - start)
+                m = np.max(distribution[start:start + length])
+                if height == m and index > last_index + 5:
+                    if interpolate:
+                        interpolated_index, interpolated_height = self.quad_interpol_argmax(distribution, x=index)
+                        p.append((interpolated_index, interpolated_height))
+                    else:
+                        p.append((index, height))
+                    last_index = index
+            # sort peaks by height, descending
+            return sorted(p, key=lambda element: element[1], reverse=True)
+
         averaged_prediction = np.average(prediction, axis=0)
-        peaks = self._find_bpm_peaks(averaged_prediction)
+        peaks = find_index_peaks(averaged_prediction)
 
         if len(peaks) == 0:
             s1 = 1.
             t1 = 0.
             t2 = 0.
         elif len(peaks) == 1:
-            bpm = peaks[0][0]
+            bpm = self._to_bpm(peaks[0][0])
             if bpm > 120:
                 alt = bpm/2
                 s1 = 0.
@@ -96,9 +139,9 @@ class TempoClassifier:
                 t1 = bpm
                 t2 = alt
         else:
-            bpm = peaks[0][0]
+            bpm = self._to_bpm(peaks[0][0])
             bpm_height = peaks[0][1]
-            alt = peaks[1][0]
+            alt = self._to_bpm(peaks[1][0])
             alt_height = peaks[1][1]
             if bpm < alt:
                 s1 = bpm_height / (bpm_height+alt_height)
@@ -109,21 +152,6 @@ class TempoClassifier:
                 t1 = alt
                 t2 = bpm
         return t1, t2, s1
-
-    def _find_bpm_peaks(self, distribution):
-        peaks = []
-        last_bpm = 0
-        for index in range(256):
-            bpm = self._to_bpm(index)
-            height = distribution[index]
-            start = max(index-5, 0)
-            length = min(11, distribution.shape[0]-start)
-            m = np.max(distribution[start:start + length])
-            if height == m and bpm > last_bpm + 5:
-                peaks.append((bpm, height))
-                last_bpm = bpm
-        # sort peaks by height, descending
-        return sorted(peaks, key=lambda element: element[1], reverse=True)
 
 
 class MeterClassifier:

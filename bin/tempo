@@ -33,16 +33,17 @@ def main():
     License: GNU Affero General Public License v3
     ''')
 
-    parser.add_argument('-v', '--version', action='version', version='tempo 0.0.2')
+    parser.add_argument('-v', '--version', action='version', version='tempo 0.0.3')
+    parser.add_argument('--interpolate', help='interpolate between tempo classes', action='store_true')
     parser.add_argument('-m', '--model', nargs='?', default='fcn',
                         help='model name [ismir2018|fma2018|cnn|fcn], defaults to fcn')
     output_format = parser.add_mutually_exclusive_group()
     output_format.add_argument('--mirex',
-                        help='use MIREX format for output',
-                        action="store_true")
+                               help='use MIREX format for output',
+                               action="store_true")
     output_format.add_argument('--jams',
-                        help='use JAMS format for output',
-                        action="store_true")
+                               help='use JAMS format for output',
+                               action="store_true")
     parser.add_argument('-i', '--input', nargs='+', help='input audio file(s) to process')
 
     output_options = parser.add_mutually_exclusive_group()
@@ -54,7 +55,7 @@ def main():
     # parse arguments
     args = parser.parse_args()
 
-    if args.output is not None and len(args.output) > 0 and len(args.input) != len(args.output):
+    if args.output is not None and 0 < len(args.output) != len(args.input):
         print('Number of input files ({}) must match number of output files ({}).\nInput={}\nOutput={}'
               .format(len(args.input), len(args.output), args.input, args.output), file=sys.stderr)
         parser.print_help(file=sys.stderr)
@@ -76,7 +77,7 @@ def main():
             features = read_features(input_file)
 
             if args.mirex or args.jams:
-                t1, t2, s1 = classifier.estimate_mirex(features)
+                t1, t2, s1 = classifier.estimate_mirex(features, interpolate=args.interpolate)
                 if args.mirex:
                     result = str(t1) + '\t' + str(t2) + '\t' + str(s1)
                 else:
@@ -86,7 +87,7 @@ def main():
                     result.file_metadata.duration = track_duration
                     result.file_metadata.identifiers = {'file': basename(input_file)}
                     tempo_a = jams.Annotation(namespace='tempo', time=0, duration=track_duration)
-                    tempo_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.2',
+                    tempo_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.3',
                                                                           annotation_tools='schreiber tempo-cnn (model=' + args.model + '), https://github.com/hendriks73/tempo-cnn',
                                                                           data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to Musical Tempo Estimation Using a Convolutional Neural Network. In Proceedings of the 19th International Society for Music Information Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
                     tempo_a.append(time=0.0,
@@ -99,7 +100,7 @@ def main():
                                    confidence=(1-s1))
                     result.annotations.append(tempo_a)
             else:
-                tempo = classifier.estimate_tempo(features)
+                tempo = classifier.estimate_tempo(features, interpolate=args.interpolate)
                 result = str(tempo)
 
             output_file = None
@@ -123,6 +124,7 @@ def main():
                     file_name.write(result + '\n')
         except Exception as e:
             print('\nAn error occurred while processing \'{}\':\n{}\n'.format(input_file, e), file=sys.stderr)
+            raise e
     print('\nDone')
 
 
