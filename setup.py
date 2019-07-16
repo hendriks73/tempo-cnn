@@ -34,7 +34,8 @@ classifiers = ['Development Status :: 3 - Alpha',
 
 # requirements
 requirements = ['scipy>=1.0.1',
-                'tensorflow>=1.10.1',
+                'numpy==1.14.5',
+                'tensorflow==1.10.1',
                 'librosa>=0.6.2',
                 'jams>=0.3.1'
                 'matplotlib>=2.2.2',
