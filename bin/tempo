@@ -33,9 +33,15 @@ def main():
     License: GNU Affero General Public License v3
     ''')
 
-    parser.add_argument('-v', '--version', action='version', version='tempo 0.0.3')
-    parser.add_argument('--interpolate', help='interpolate between tempo classes', action='store_true')
-    parser.add_argument('-m', '--model', nargs='?', default='fcn',
+    parser.add_argument('-v', '--version',
+                        action='version',
+                        version='tempo 0.0.3')
+    parser.add_argument('--interpolate',
+                        help='interpolate between tempo classes',
+                        action='store_true')
+    parser.add_argument('-m', '--model',
+                        nargs='?',
+                        default='fcn',
                         help='model name [ismir2018|fma2018|cnn|fcn], defaults to fcn')
     output_format = parser.add_mutually_exclusive_group()
     output_format.add_argument('--mirex',
@@ -44,13 +50,22 @@ def main():
     output_format.add_argument('--jams',
                                help='use JAMS format for output',
                                action="store_true")
-    parser.add_argument('-i', '--input', nargs='+', help='input audio file(s) to process')
+    parser.add_argument('-i', '--input',
+                        nargs='+',
+                        help='input audio file(s) to process')
 
     output_options = parser.add_mutually_exclusive_group()
     output_location = parser.add_mutually_exclusive_group()
-    output_location.add_argument('-o', '--output', nargs='*', help='output file(s)')
-    output_location.add_argument('-d', '--outputdir', help='output directory')
-    output_options.add_argument('-e', '--extension', help='append given extension to original file name for results')
+    output_location.add_argument('-o', '--output',
+                                 nargs='*',
+                                 help='output file(s)')
+    output_location.add_argument('-d', '--outputdir',
+                                 help='output directory')
+    output_options.add_argument('-e', '--extension',
+                                help='append given extension to original file name for results')
+    output_options.add_argument('-c', '--cont',
+                                help='continue after error, if multiple files are processed',
+                                action='store_true')
 
     # parse arguments
     args = parser.parse_args()
@@ -123,8 +138,11 @@ def main():
                 with open(output_file, mode='w') as file_name:
                     file_name.write(result + '\n')
         except Exception as e:
-            print('\nAn error occurred while processing \'{}\':\n{}\n'.format(input_file, e), file=sys.stderr)
-            raise e
+            if not args.cont:
+                print('\nAn error occurred while processing \'{}\':\n{}\n'.format(input_file, e), file=sys.stderr)
+                raise e
+            else:
+                print('E({})'.format(input_file), end='', flush=True)
     print('\nDone')
 
 
