@@ -2,6 +2,10 @@
 Changes
 =======
 
+0.0.4:
+ - Added support for Mazurka models.
+ - Added support for exporting data from tempograms.
+
 0.0.3:
  - Added flag ``--interpolate`` for ``tempo`` to increase accuracy.
  - Migrated models to TensorFlow 1.10.1.

@@ -9,6 +9,36 @@ import numpy as np
 from tensorflow.python.keras.models import load_model
 
 
+def std_normalizer(data):
+    """
+    Normalizes data to zero mean and unit variance.
+    Used by Mazurka models.
+
+    :param data: data
+    :return: standardized data
+    """
+    # normalize as 64 bit, to avoid numpy warnings
+    data = data.astype(np.float64)
+    mean = np.mean(data)
+    std = np.std(data)
+    if std != 0.:
+        data = (data-mean) / std
+    return data.astype(np.float16)
+
+
+def max_normalizer(data):
+    """
+    Divides by max. Used as normalization by older models.
+
+    :param data: data
+    :return: normalized data (max = 1)
+    """
+    m = np.max(data)
+    if m != 0:
+        data /= m
+    return data
+
+
 class TempoClassifier:
     """
     Classifier that can estimate musical tempo in different formats.
@@ -23,10 +53,18 @@ class TempoClassifier:
         if 'fma' in model_name:
             # fma model uses log BPM scale
             factor = 256. / np.log(10)
-            self._to_bpm = lambda index: np.exp((index + 435)/factor)
+            self.to_bpm = lambda index: np.exp((index + 435) / factor)
         else:
-            self._to_bpm = lambda index: index + 30
+            self.to_bpm = lambda index: index + 30
+
+        # match alias for dt_maz_v fold 0.
+        if model_name == 'mazurka':
+            model_name = 'dt_maz_v_fold0'
         self.model_name = model_name
+
+        # mazurka models use a different kind of normalization
+        self.normalize = std_normalizer if 'dt_maz_v' in self.model_name else max_normalizer
+
         resource = _to_model_resource(model_name)
         try:
             file = _extract_from_package(resource)
@@ -51,7 +89,8 @@ class TempoClassifier:
         assert data.shape[1] == 40, 'Second dim of data must be 40. Actual shape was ' + str(data.shape)
         assert data.shape[2] == 256, 'Third dim of data must be 256. Actual shape was ' + str(data.shape)
         assert data.shape[3] == 1, 'Fourth dim of data must be 1. Actual shape was ' + str(data.shape)
-        return self.model.predict(data, data.shape[0])
+        norm_data = self.normalize(data)
+        return self.model.predict(norm_data, norm_data.shape[0])
 
     @staticmethod
     def quad_interpol_argmax(y, x=None):
@@ -87,7 +126,7 @@ class TempoClassifier:
             index, _ = self.quad_interpol_argmax(averaged_prediction)
         else:
             index = np.argmax(averaged_prediction)
-        return self._to_bpm(index)
+        return self.to_bpm(index)
 
     def estimate_mirex(self, data, interpolate=False):
         """
@@ -127,7 +166,7 @@ class TempoClassifier:
             t1 = 0.
             t2 = 0.
         elif len(peaks) == 1:
-            bpm = self._to_bpm(peaks[0][0])
+            bpm = self.to_bpm(peaks[0][0])
             if bpm > 120:
                 alt = bpm/2
                 s1 = 0.
@@ -139,9 +178,9 @@ class TempoClassifier:
                 t1 = bpm
                 t2 = alt
         else:
-            bpm = self._to_bpm(peaks[0][0])
+            bpm = self.to_bpm(peaks[0][0])
             bpm_height = peaks[0][1]
-            alt = self._to_bpm(peaks[1][0])
+            alt = self.to_bpm(peaks[1][0])
             alt_height = peaks[1][1]
             if bpm < alt:
                 s1 = bpm_height / (bpm_height+alt_height)
@@ -167,6 +206,7 @@ class MeterClassifier:
         """
         self._to_meter = lambda index: index + 2
         self.model_name = model_name
+        self.normalize = std_normalizer if 'dt_maz_v' in self.model_name else max_normalizer
         resource = _to_model_resource(model_name)
         try:
             file = _extract_from_package(resource)
@@ -191,7 +231,8 @@ class MeterClassifier:
         assert data.shape[1] == 40, 'Second dim of data must be 40. Actual shape was ' + str(data.shape)
         assert data.shape[2] == 512, 'Third dim of data must be 512. Actual shape was ' + str(data.shape)
         assert data.shape[3] == 1, 'Fourth dim of data must be 1. Actual shape was ' + str(data.shape)
-        return self.model.predict(data, data.shape[0])
+        norm_data = self.normalize(data)
+        return self.model.predict(norm_data, norm_data.shape[0])
 
     def estimate_meter(self, data):
         """

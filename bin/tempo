@@ -42,7 +42,7 @@ def main():
     parser.add_argument('-m', '--model',
                         nargs='?',
                         default='fcn',
-                        help='model name [ismir2018|fma2018|cnn|fcn], defaults to fcn')
+                        help='model name [ismir2018|fma2018|cnn|fcn|mazurka], defaults to fcn')
     output_format = parser.add_mutually_exclusive_group()
     output_format.add_argument('--mirex',
                                help='use MIREX format for output',
@@ -82,7 +82,7 @@ def main():
         sys.exit(1)
 
     # load model
-    print('Loading model...')
+    print('Loading model \'{}\'...'.format(args.model))
     classifier = TempoClassifier(args.model)
 
     print('Processing file(s)', end='', flush=True)

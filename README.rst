@@ -54,6 +54,9 @@ To create such a tempogram, run
 As output, ``tempogram`` will create a ``.png`` file. Additional options to select different models
 and output formats are available.
 
+You may use the ``--csv`` option to export local tempo estimates in a parseable format and the
+``--hop-length`` option to change temporal resolution.
+
 Tempo-CNN provides experimental support for temporal property estimation of Greek
 folk music [2]. The corresponding models are named ``fma2018`` (for tempo) and ``fma2018-meter``
 (for meter). To estimate the meter's numerator, run

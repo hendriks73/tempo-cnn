@@ -28,6 +28,7 @@ def read_features(file, frames=256, hop_length=128, zero_pad=False):
     :param frames: 256
     :param hop_length: 128 or shorter
     :param zero_pad: adds 128 zero frames both at the front and back
+    :param normalize: normalization function
     :return: feature tensor for the whole file
     """
     y, sr = librosa.load(file, sr=11025)
@@ -65,12 +66,5 @@ def _to_sliding_window(data, window_length, hop_length):
     total_frames = data.shape[2]
     windowed_data = []
     for offset in range(0, ((total_frames - window_length) // hop_length + 1) * hop_length, hop_length):
-        window = np.copy(data[:, :, offset:window_length + offset, :])
-        # normalize
-        m = np.max(window)
-        if m == 0:
-            continue
-
-        window /= m
-        windowed_data.append(window)
+        windowed_data.append(np.copy(data[:, :, offset:window_length + offset, :]))
     return np.concatenate(windowed_data, axis=0)
