@@ -22,6 +22,16 @@ package_data = ['models/cnn.h5',
                 'models/ismir2018.h5',
                 'models/fma2018.h5',
                 'models/fma2018-meter.h5',
+                'models/dt_maz_m_fold0.h5',
+                'models/dt_maz_m_fold1.h5',
+                'models/dt_maz_m_fold2.h5',
+                'models/dt_maz_m_fold3.h5',
+                'models/dt_maz_m_fold4.h5',
+                'models/dt_maz_v_fold0.h5',
+                'models/dt_maz_v_fold1.h5',
+                'models/dt_maz_v_fold2.h5',
+                'models/dt_maz_v_fold3.h5',
+                'models/dt_maz_v_fold4.h5',
                 ]
 
 # some PyPI metadata
@@ -35,10 +45,10 @@ classifiers = ['Development Status :: 3 - Alpha',
 # requirements
 requirements = ['scipy>=1.0.1',
                 'numpy==1.14.5',
-                'tensorflow==1.10.1',
-                'librosa>=0.6.2',
-                'jams>=0.3.1'
-                'matplotlib>=2.2.2',
+                'tensorflow==1.14.0',
+                'librosa==0.6.2',
+                'jams>=0.3.1',
+                'matplotlib>=3.0.0',
                 'h5py>=2.7.0',
                 ]
 
