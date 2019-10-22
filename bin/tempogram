@@ -45,6 +45,8 @@ def main():
     parser.add_argument('-s', '--sharpen',
                         help='sharpen the image to a one-hot representation',
                         action="store_true")
+    parser.add_argument('-n', '--norm-frame',
+                        help='enable framewise normalization using (max|l1|l2)')
     parser.add_argument('--hop-length',
                         help='hop length between predictions, 1 hop = 0.0464399093s',
                         default=32, type=int)
@@ -66,15 +68,29 @@ def main():
     if log_scale:
         min_bpm = 50
         max_bpm = 500
+        max_ylim = 510
     else:
         min_bpm = 30
         max_bpm = 286
+        max_ylim = 300
 
     print('Processing file(s)', end='', flush=True)
     for file in args.audio_file:
         print('.', end='', flush=True)
         features = read_features(file, hop_length=hop_length, zero_pad=True)
         predictions = classifier.estimate(features)
+
+        if args.norm_frame is not None:
+            norm_order = np.inf
+            if 'max' == args.norm_frame.lower():
+                norm_order = np.inf
+            elif 'l1' == args.norm_frame.lower():
+                norm_order = 1
+            elif 'l2' == args.norm_frame.lower():
+                norm_order = 2
+            else:
+                print('Unknown norm. Using max norm.', end='', flush=True)
+            predictions = (predictions.T / np.linalg.norm(predictions, ord=norm_order, axis=1)).T
 
         if args.sharpen:
             predictions = (predictions.T / np.max(predictions, axis=1)).T
@@ -89,6 +105,7 @@ def main():
         if args.png:
             fig.set_size_inches(5, 2)
         ax = fig.add_subplot(111)
+        ax.set_ylim((0, max_ylim))
         ax.imshow(predictions.T, origin='lower', cmap='Greys', aspect='auto',
                   extent=(0, max_length_in_s, min_bpm, max_bpm))
         if log_scale:

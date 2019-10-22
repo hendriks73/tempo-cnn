@@ -5,6 +5,7 @@ Changes
 0.0.4:
  - Added support for Mazurka models.
  - Added support for exporting data from tempograms.
+ - Added support for framewise normalization in tempograms.
 
 0.0.3:
  - Added flag ``--interpolate`` for ``tempo`` to increase accuracy.
