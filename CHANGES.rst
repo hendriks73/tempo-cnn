@@ -6,6 +6,7 @@ Changes
  - Added support for Mazurka models.
  - Added support for exporting data from tempograms.
  - Added support for framewise normalization in tempograms.
+ - Moved to TensorFlow 1.14.0.
 
 0.0.3:
  - Added flag ``--interpolate`` for ``tempo`` to increase accuracy.
