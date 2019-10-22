@@ -96,8 +96,8 @@ def main():
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_minor_formatter(ScalarFormatter())
 
-        ax.set_xlabel('Time in seconds')
-        ax.set_ylabel('Tempo in BPM')
+        ax.set_xlabel('Time (seconds)')
+        ax.set_ylabel('Tempo (BPM)')
 
         if args.csv:
             if args.sharpen:
