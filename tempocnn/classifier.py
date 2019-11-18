@@ -60,10 +60,21 @@ class TempoClassifier:
         # match alias for dt_maz_v fold 0.
         if model_name == 'mazurka':
             model_name = 'dt_maz_v_fold0'
+        # match aliases for specific deep/shallow models
+        elif model_name == 'deeptemp':
+            model_name = 'deeptemp_k16'
+        elif model_name == 'shallowtemp':
+            model_name = 'shallowtemp_k6'
+        elif model_name == 'deepsquare':
+            model_name = 'deepsquare_k16'
         self.model_name = model_name
 
-        # mazurka models use a different kind of normalization
-        self.normalize = std_normalizer if 'dt_maz_v' in self.model_name else max_normalizer
+        # mazurka and deeptemp/shallowtempo models use a different kind of normalization
+        self.normalize = std_normalizer if 'dt_maz_v' in self.model_name \
+                                           or 'deeptemp' in self.model_name \
+                                           or 'deepsquare' in self.model_name \
+                                           or 'shallowtemp' in self.model_name \
+            else max_normalizer
 
         resource = _to_model_resource(model_name)
         try:
@@ -206,7 +217,12 @@ class MeterClassifier:
         """
         self._to_meter = lambda index: index + 2
         self.model_name = model_name
-        self.normalize = std_normalizer if 'dt_maz_v' in self.model_name else max_normalizer
+        # mazurka and deeptemp/shallowtempo models use a different kind of normalization
+        self.normalize = std_normalizer if 'dt_maz_v' in self.model_name \
+                                           or 'deeptemp' in self.model_name \
+                                           or 'deepsquare' in self.model_name \
+                                           or 'shallowtemp' in self.model_name \
+            else max_normalizer
         resource = _to_model_resource(model_name)
         try:
             file = _extract_from_package(resource)

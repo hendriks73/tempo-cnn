@@ -42,7 +42,7 @@ def main():
     parser.add_argument('-m', '--model',
                         nargs='?',
                         default='fcn',
-                        help='model name [ismir2018|fma2018|cnn|fcn|mazurka], defaults to fcn')
+                        help='model name [ismir2018|fma2018|cnn|fcn|mazurka|deeptemp|deepsquare|shallowtemp], defaults to fcn')
     output_format = parser.add_mutually_exclusive_group()
     output_format.add_argument('--mirex',
                                help='use MIREX format for output',
@@ -84,6 +84,7 @@ def main():
     # load model
     print('Loading model \'{}\'...'.format(args.model))
     classifier = TempoClassifier(args.model)
+    print('Loaded model with {} parameters.'.format(classifier.model.count_params()))
 
     print('Processing file(s)', end='', flush=True)
     for index, input_file in enumerate(args.input):

@@ -25,6 +25,23 @@ paper [1], please run
 
     tempo -m ismir2018 --jams -i my_audio.wav
 
+
+To use one of the ``DeepTemp`` models from [3] (see also repo
+`directional_cnns <https://github.com/hendriks73/directional_cnns>`_), run
+
+.. code-block:: console
+
+    tempo -m deeptemp --jams -i my_audio.wav
+
+or,
+
+.. code-block:: console
+
+    tempo -m deeptemp_k24 --jams -i my_audio.wav
+
+if you want to use a higher capacity model (some ``k``-values are supported).
+``deepsquare`` and ``shallowtemp`` models may also be used.
+
 For batch processing, you may want to run ``tempo`` like this:
 
 .. code-block:: console
@@ -56,6 +73,7 @@ and output formats are available.
 
 You may use the ``--csv`` option to export local tempo estimates in a parseable format and the
 ``--hop-length`` option to change temporal resolution.
+The parameters ``--sharpen`` and ``--norm-frame`` let you post-process the image.
 
 Tempo-CNN provides experimental support for temporal property estimation of Greek
 folk music [2]. The corresponding models are named ``fma2018`` (for tempo) and ``fma2018-meter``
@@ -89,11 +107,12 @@ For details, please see the `LICENSE <LICENSE>`_ file.
 Citation
 ========
 
-If you use Tempo-CNN in your work, please consider citing it:
+If you use Tempo-CNN in your work, please consider citing it.
+Original publication:
 
 .. code-block:: latex
 
-   @inproceedings{
+   @inproceedings{SchreiberM18_TempoCNN_ISMIR,
       Title = {A Single-Step Approach to Musical Tempo Estimation Using a Convolutional Neural Network},
       Author = {Schreiber, Hendrik and M{\"u}ller Meinard},
       Booktitle = {Proceedings of the 19th International Society for Music Information Retrieval Conference ({ISMIR})},
@@ -103,6 +122,18 @@ If you use Tempo-CNN in your work, please consider citing it:
       Address = {Paris, France}
    }
 
+ShallowTemp, DeepTemp, and DeepSquare models:
+
+.. code-block:: latex
+
+   @inproceedings{SchreiberM19_CNNKeyTempo_SMC,
+	  Title = {Musical Tempo and Key Estimation using Convolutional Neural Networks with Directional Filters},
+	  Author = {Hendrik Schreiber and Meinard M{\"u}ller},
+	  Booktitle = {Proceedings of the Sound and Music Computing Conference ({SMC})},
+	  Pages = {47--54},
+	  Year = {2019},
+      Address = {M{\'a}laga, Spain}
+   }
 
 References
 ==========
@@ -116,3 +147,8 @@ References
     <http://www.tagtraum.com/download/2018_SchreiberGreekFolkTempoMeter.pdf>`_
     8th International Workshop on Folk Music Analysis (FMA),
     Thessaloniki, Greece, June 2018.
+.. [3] Hendrik Schreiber, Meinard Müller, `Musical Tempo and Key Estimation using Convolutional
+    Neural Networks with Directional Filters
+    <http://smc2019.uma.es/articles/P1/P1_07_SMC2019_paper.pdf>`_
+    Proceedings of the Sound and Music Computing Conference (SMC),
+    Málaga, Spain, 2019.

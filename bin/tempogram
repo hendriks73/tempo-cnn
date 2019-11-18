@@ -51,7 +51,7 @@ def main():
                         help='hop length between predictions, 1 hop = 0.0464399093s',
                         default=32, type=int)
     parser.add_argument('-m', '--model', nargs='?', default='fcn',
-                        help='model name (ismir2018|fma2018|cnn|fcn|mazurka), defaults to fcn')
+                        help='model name (ismir2018|fma2018|cnn|fcn|mazurka|deeptemp|deepsquare|shallowtemp), defaults to fcn')
     parser.add_argument('audio_file', nargs='+', help='audio file to process')
 
     # parse arguments
@@ -60,6 +60,7 @@ def main():
     # load model
     print('Loading model \'{}\'...'.format(args.model))
     classifier = TempoClassifier(args.model)
+    print('Loaded model with {} parameters.'.format(classifier.model.count_params()))
 
     hop_length = args.hop_length
     sr = 11025.0
