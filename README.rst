@@ -114,10 +114,7 @@ Citation
 ========
 
 If you use Tempo-CNN in your work, please consider citing it.
-Original publication
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1492353.svg
-   :target: https://doi.org/10.5281/zenodo.1492353 :
-
+Original publication:
 
 .. code-block:: latex
 
