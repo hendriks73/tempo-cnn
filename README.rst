@@ -147,7 +147,7 @@ References
 ==========
 
 .. [1] Hendrik Schreiber, Meinard Müller, `A Single-Step Approach to Musical Tempo Estimation
-    Using a Convolutional Neural Network <http://ismir2018.ircam.fr/doc/pdfs/141_Paper.pdf>`_
+    Using a Convolutional Neural Network <https://zenodo.org/record/1492353/files/141_Paper.pdf>`_
     Proceedings of the 19th International Society for Music Information
     Retrieval Conference (ISMIR), Paris, France, Sept. 2018.
 .. [2] Hendrik Schreiber, `Technical Report: Tempo and Meter Estimation for
