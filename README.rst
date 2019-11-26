@@ -1,5 +1,11 @@
 .. image:: https://img.shields.io/badge/License-AGPL%20v3-blue.svg
-    :target: https://www.gnu.org/licenses/agpl-3.0
+   :target: https://www.gnu.org/licenses/agpl-3.0
+
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1492353.svg
+   :target: https://doi.org/10.5281/zenodo.1492353
+
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3553592.svg
+   :target: https://doi.org/10.5281/zenodo.3553592
 
 =========
 Tempo-CNN
@@ -108,7 +114,10 @@ Citation
 ========
 
 If you use Tempo-CNN in your work, please consider citing it.
-Original publication:
+Original publication
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1492353.svg
+   :target: https://doi.org/10.5281/zenodo.1492353 :
+
 
 .. code-block:: latex
 
@@ -119,7 +128,9 @@ Original publication:
       Pages = {98--105},
       Month = {9},
       Year = {2018},
-      Address = {Paris, France}
+      Address = {Paris, France},
+      doi = {10.5281/zenodo.1492353},
+      url = {https://doi.org/10.5281/zenodo.1492353}
    }
 
 ShallowTemp, DeepTemp, and DeepSquare models:
