@@ -35,7 +35,7 @@ def main():
 
     parser.add_argument('-v', '--version',
                         action='version',
-                        version='tempo 0.0.3')
+                        version='tempo 0.0.4')
     parser.add_argument('--interpolate',
                         help='interpolate between tempo classes',
                         action='store_true')
@@ -103,7 +103,7 @@ def main():
                     result.file_metadata.duration = track_duration
                     result.file_metadata.identifiers = {'file': basename(input_file)}
                     tempo_a = jams.Annotation(namespace='tempo', time=0, duration=track_duration)
-                    tempo_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.3',
+                    tempo_a.annotation_metadata = jams.AnnotationMetadata(version='0.0.4',
                                                                           annotation_tools='schreiber tempo-cnn (model=' + args.model + '), https://github.com/hendriks73/tempo-cnn',
                                                                           data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to Musical Tempo Estimation Using a Convolutional Neural Network. In Proceedings of the 19th International Society for Music Information Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
                     tempo_a.append(time=0.0,

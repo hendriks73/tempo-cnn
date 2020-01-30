@@ -7,7 +7,7 @@ Changes
  - Added support for Mazurka models.
  - Added support for exporting data from tempograms.
  - Added support for framewise normalization in tempograms.
- - Moved to TensorFlow 1.14.0.
+ - Moved to TensorFlow 1.15.2.
  - Print number of model parameters.
 
 0.0.3:

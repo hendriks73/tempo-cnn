@@ -1,6 +1,6 @@
-numpy
+numpy==1.16.0
 scipy>=1.0.1
-tensorflow>=1.14.0
+tensorflow>=1.15.2
 librosa>=0.6.2
 jams>=0.3.1
 matplotlib>=3.0.0

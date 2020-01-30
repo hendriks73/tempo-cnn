@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 import glob
 
 # define version
-version = '0.0.3'
+version = '0.0.4'
 
 # define scripts to be installed by the PyPI package
 scripts = glob.glob('bin/*')
@@ -61,8 +61,8 @@ classifiers = ['Development Status :: 3 - Alpha',
 
 # requirements
 requirements = ['scipy>=1.0.1',
-                'numpy==1.14.5',
-                'tensorflow==1.14.0',
+                'numpy==1.16.0',
+                'tensorflow==1.15.2',
                 'librosa==0.6.2',
                 'jams>=0.3.1',
                 'matplotlib>=3.0.0',

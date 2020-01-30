@@ -41,7 +41,7 @@ def main():
     License: GNU Affero General Public License v3
     ''')
 
-    parser.add_argument('-v', '--version', action='version', version='greekfolk 0.0.3')
+    parser.add_argument('-v', '--version', action='version', version='greekfolk 0.0.4')
     parser.add_argument('input', help='input folder with wav files')
     parser.add_argument('output', help='output folder')
 
