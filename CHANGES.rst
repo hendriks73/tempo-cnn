@@ -6,6 +6,7 @@ Changes
  - Moved to TensorFlow 1.15.4.
  - Consolidated version info
  - Consolidated requirements
+ - Switched to pytest
 
 0.0.4:
  - Added support for DeepTemp, DeepSquare, and ShallowTemp models.
