@@ -84,10 +84,15 @@ setup(name='tempocnn',
       author_email='hs@tagtraum.com',
       url='https://github.com/hendriks73/tempo-cnn',
       license='AGPL',
-      packages=find_packages(exclude=['tests', 'docs']),
+      packages=find_packages(exclude=['test', 'docs']),
       package_data={'tempocnn': package_data},
       exclude_package_data={'': ['tests', 'docs']},
       scripts=scripts,
       install_requires=requirements,
-      test_suite='nose.collector',
+      extras_require={
+          "testing": [
+              "pytest",
+              "coverage",
+          ]
+      },
       classifiers=classifiers)
