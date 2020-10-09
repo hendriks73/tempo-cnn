@@ -53,14 +53,6 @@ package_data = ['models/cnn.h5',
                 'models/shallowtemp_k12.h5',
                 ]
 
-# some PyPI metadata
-classifiers = ['Development Status :: 3 - Alpha',
-               'Programming Language :: Python :: 3.6',
-               'Environment :: Console',
-               'License :: OSI Approved :: GNU Affero General Public License v3',
-               'Topic :: Multimedia :: Sound/Audio :: Analysis',
-               'Topic :: Scientific/Engineering :: Artificial Intelligence']
-
 # requirements
 with open('requirements.txt', 'r') as fh:
     requirements = fh.read().splitlines()
@@ -76,7 +68,7 @@ except TypeError:
 # the actual setup routine
 setup(name='tempocnn',
       version=version,
-      description='Python audio signal processing library',
+      description='Python audio signal processing library for musical tempo detection',
       long_description=long_description,
       author='Hendrik Schreiber '
              'tagtraum industries incorporated, '
@@ -88,6 +80,7 @@ setup(name='tempocnn',
       package_data={'tempocnn': package_data},
       exclude_package_data={'': ['tests', 'docs']},
       scripts=scripts,
+      python_requires='>=3.6',
       install_requires=requirements,
       extras_require={
           "testing": [
@@ -95,4 +88,11 @@ setup(name='tempocnn',
               "coverage",
           ]
       },
-      classifiers=classifiers)
+      classifiers=['Development Status :: 3 - Alpha',
+                   'Programming Language :: Python :: 3.6',
+                   'Programming Language :: Python :: 3.7',
+                   'Environment :: Console',
+                   'License :: OSI Approved :: GNU Affero General Public License v3',
+                   'Topic :: Multimedia :: Sound/Audio :: Analysis',
+                   'Topic :: Scientific/Engineering :: Artificial Intelligence']
+      )

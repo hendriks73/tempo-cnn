@@ -4,9 +4,10 @@ Changes
 
 0.0.5:
  - Moved to TensorFlow 1.15.4.
- - Consolidated version info
- - Consolidated requirements
- - Switched to pytest
+ - Consolidated version info.
+ - Consolidated requirements.
+ - Switched to pytest.
+ - Officially support Python 3.7.
 
 0.0.4:
  - Added support for DeepTemp, DeepSquare, and ShallowTemp models.
