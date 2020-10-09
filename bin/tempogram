@@ -12,6 +12,7 @@ from matplotlib.ticker import ScalarFormatter
 
 from tempocnn.classifier import TempoClassifier
 from tempocnn.feature import read_features
+from tempocnn.version import __version__ as package_version
 
 
 def main():
@@ -33,7 +34,7 @@ def main():
     License: GNU Affero General Public License v3
     ''')
 
-    parser.add_argument('-v', '--version', action='version', version='tempogram 0.0.4')
+    parser.add_argument('-v', '--version', action='version', version=f'tempogram {package_version}')
     parser.add_argument('-p', '--png',
                         help='write the tempogram to a file, '
                              'adding the file extension .png to the input file name',
