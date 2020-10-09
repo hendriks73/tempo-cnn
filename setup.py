@@ -7,11 +7,13 @@ This file contains the setup for setuptools to distribute everything as a
 """
 
 from setuptools import setup, find_packages
+from importlib.machinery import SourceFileLoader
 
 import glob
 
 # define version
-version = '0.0.4'
+version = SourceFileLoader("tempocnn.version", "tempocnn/version.py").load_module()
+version = version.__version__
 
 # define scripts to be installed by the PyPI package
 scripts = glob.glob('bin/*')
@@ -60,14 +62,8 @@ classifiers = ['Development Status :: 3 - Alpha',
                'Topic :: Scientific/Engineering :: Artificial Intelligence']
 
 # requirements
-requirements = ['scipy>=1.0.1',
-                'numpy==1.16.0',
-                'tensorflow==1.15.2',
-                'librosa==0.6.2',
-                'jams>=0.3.1',
-                'matplotlib>=3.0.0',
-                'h5py>=2.7.0',
-                ]
+with open('requirements.txt', 'r') as fh:
+    requirements = fh.read().splitlines()
 
 # docs to be included
 try:

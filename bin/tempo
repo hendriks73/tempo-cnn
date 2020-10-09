@@ -13,6 +13,7 @@ import librosa
 
 from tempocnn.classifier import TempoClassifier
 from tempocnn.feature import read_features
+from tempocnn.version import __version__ as package_version
 
 
 def main():
@@ -35,7 +36,7 @@ def main():
 
     parser.add_argument('-v', '--version',
                         action='version',
-                        version='tempo 0.0.4')
+                        version=f'tempo {package_version}')
     parser.add_argument('--interpolate',
                         help='interpolate between tempo classes',
                         action='store_true')
