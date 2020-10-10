@@ -25,4 +25,3 @@ def test_init(test_track):
     assert features.shape[1] == 40
     assert features.shape[2] == 256
     assert features.shape[3] == 1
-
