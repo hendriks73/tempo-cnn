@@ -44,16 +44,16 @@ jobs:
           coverage report -m
           coverage xml -o coverage{{ matrix.python-version }}.xml
       - name: Upload pytest test results
-          uses: actions/upload-artifact@v2
-          with:
-            name: pytest-results-${{ matrix.python-version }}
-            path: pytest_report${{ matrix.python-version }}.xml
-          # Use always() to always run this step to publish test results when there are test failures
-          if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-results-${{ matrix.python-version }}
+          path: pytest_report${{ matrix.python-version }}.xml
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
       - name: Upload coverageresults
-          uses: actions/upload-artifact@v2
-          with:
-            name: coverage-${{ matrix.python-version }}
-            path: coverage${{ matrix.python-version }}.xml
-          # Use always() to always run this step to publish test results when there are test failures
-          if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-${{ matrix.python-version }}
+          path: coverage${{ matrix.python-version }}.xml
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
