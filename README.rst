@@ -203,6 +203,7 @@ References
     Proceedings of the Sound and Music Computing Conference (SMC),
     Málaga, Spain, 2019.
 .. [4] Hendrik Schreiber, Frank Zalkow, Meinard Müller,
-    *Modeling and Estimating Local Tempo: A Case Study on Chopin’s Mazurkas*,
+    `Modeling and Estimating Local Tempo: A Case Study on Chopin’s
+    Mazurkas <https://program.ismir2020.net/static/final_papers/14.pdf>`_,
     Proceedings of the 21st International Society for Music Information
     Retrieval Conference (ISMIR), Montréal, QC, Canada, Oct. 2020.
