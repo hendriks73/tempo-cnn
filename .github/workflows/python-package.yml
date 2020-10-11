@@ -42,9 +42,9 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          coverage run --source ./tempocnn -i -m pytest --verbose --junitxml=pytest_report${{ matrix.python-version }}.xml
+          coverage run --source ./tempocnn -m pytest --verbose --junitxml=pytest_report${{ matrix.python-version }}.xml
           coverage report -m
-          coverage xml -o coverage{{ matrix.python-version }}.xml
+          coverage xml -i -o coverage{{ matrix.python-version }}.xml
       - name: Upload pytest test results
         uses: actions/upload-artifact@v2
         with:
