@@ -9,6 +9,7 @@ Changes
  - Switched to pytest.
  - Officially support Python 3.7.
  - Enabled GitHub actions for packaging and testing.
+ - Added Pypi workflow.
 
 0.0.4:
  - Added support for DeepTemp, DeepSquare, and ShallowTemp models.
