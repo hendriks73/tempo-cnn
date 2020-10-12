@@ -1,9 +1,11 @@
 # encoding: utf-8
-
+import logging
 import os
 import pkgutil
 import sys
-import tempfile
+import urllib.request
+from pathlib import Path
+from urllib.error import HTTPError
 
 import numpy as np
 from tensorflow.python.keras.models import load_model
@@ -83,10 +85,7 @@ class TempoClassifier:
             print('Failed to find a model named \'{}\'. Please check the model name.'.format(model_name),
                   file=sys.stderr)
             raise e
-        try:
-            self.model = load_model(file)
-        finally:
-            os.remove(file)
+        self.model = load_model(file)
 
     def estimate(self, data):
         """
@@ -273,8 +272,39 @@ def _to_model_resource(model_name):
 
 
 def _extract_from_package(resource):
+    # check local cache
+    cache_path = Path(Path.home(), '.tempocnn', resource)
+    if cache_path.exists():
+        return str(cache_path)
+
+    # ensure cache path exists
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+
     data = pkgutil.get_data('tempocnn', resource)
-    with tempfile.NamedTemporaryFile(prefix='model', suffix='.h5', delete=False) as f:
+    if not data:
+        data = _load_model_from_github(resource)
+
+    # write to cache
+    with open(cache_path, 'wb') as f:
         f.write(data)
-        name = f.name
-    return name
+
+    return str(cache_path)
+
+
+def _load_model_from_github(resource):
+    url = f"https://raw.githubusercontent.com/hendriks73/tempo-cnn/main/tempocnn/{resource}"
+    logging.info(f"Attempting to download model file from main branch {url}")
+    try:
+        response = urllib.request.urlopen(url)
+        return response.read()
+    except HTTPError as e:
+        # fall back to dev branch
+        try:
+            url = f"https://raw.githubusercontent.com/hendriks73/tempo-cnn/dev/tempocnn/{resource}"
+            logging.info(f"Attempting to download model file from dev branch {url}")
+            response = urllib.request.urlopen(url)
+            return response.read()
+        except Exception:
+            pass
+
+        raise FileNotFoundError(f"Failed to download model from {url}: {type(e).__name__}: {e}")
