@@ -50,6 +50,8 @@ or,
 if you want to use a higher capacity model (some ``k``-values are supported).
 ``deepsquare`` and ``shallowtemp`` models may also be used.
 
+Note that some models may be downloaded (and cached) at execution time.
+
 Mazurka Models
 --------------
 
@@ -66,6 +68,10 @@ So to use fold 3 from the *M*-split, use
 .. code-block:: console
 
     tempo -m dt_maz_m_fold3 -i my_audio.wav
+
+Note that Mazurka models may be used to estimate a global tempo, but were
+actually trained to create tempograms (local tempo, see below) for Chopin
+Mazurkas [4].
 
 Batch Processing
 ----------------
@@ -118,11 +124,64 @@ folk music [2]. The corresponding models are named ``fma2018`` (for tempo) and `
 
     meter -m fma2018-meter -i my_audio.wav
 
+Programmatic Usage
+==================
+
+After installation via ``pip install .`` or ``pip install tempocnn``, you may use
+the package programmatically.
+
+Example for *global* tempo estimation:
+
+.. code-block:: python
+
+    from tempocnn.classifier import TempoClassifier
+    from tempocnn.feature import read_features
+
+    model_name = 'cnn'
+    input_file = 'some_audio_file.mp3'
+    # initialize the model (may be re-used for multiple files)
+    classifier = TempoClassifier(model_name)
+    # read the file's features
+    features = read_features(input_file)
+    # estimate the global tempo
+    tempo = classifier.estimate_tempo(features, interpolate=False)
+    print(f"Estimated global tempo: {tempo}")
+
+
+Example for *local* tempo estimation:
+
+
+.. code-block:: python
+
+    from tempocnn.classifier import TempoClassifier
+    from tempocnn.feature import read_features
+
+    model_name = 'cnn'
+    input_file = 'some_audio_file.mp3'
+    # initialize the model (may be re-used for multiple files)
+    classifier = TempoClassifier(model_name)
+    # read the file's features, specify hop_length for temporal resolution
+    features = read_features(input_file, frames=256, hop_length=32)
+    # estimate local tempi, this returns tempo classes, i.e., a distribution
+    local_tempo_classes = classifier.estimate(features)
+    # find argmax per frame and convert class index to BPM value
+    max_predictions = np.argmax(local_tempo_classes, axis=1)
+    local_tempi = classifier.to_bpm(max_predictions)
+    print(f"Estimated local tempo classes: {local_tempi}")
+
 
 Installation
 ============
 
-Clone this repo and run ``setup.py install`` using Python 3.6:
+In a clean Python 3.6 or 3.7 environment, simply run:
+
+.. code-block:: console
+
+    pip install tempocnn
+
+
+If you rather want to install from source, clone this repo and run
+``setup.py install`` using Python 3.6 or 3.7:
 
 .. code-block:: console
 
@@ -130,7 +189,6 @@ Clone this repo and run ``setup.py install`` using Python 3.6:
     cd tempo-cnn
     python setup.py install
 
-You may need to install TensorFlow using ``pip`` from the command line.
 
 License
 =======
