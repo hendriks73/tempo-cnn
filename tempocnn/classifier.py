@@ -1,4 +1,3 @@
-# encoding: utf-8
 import logging
 import os
 import pkgutil
@@ -9,6 +8,8 @@ from urllib.error import HTTPError
 
 import numpy as np
 from tensorflow.python.keras.models import load_model
+
+logger = logging.getLogger('tempocnn.classifier')
 
 
 def std_normalizer(data):
@@ -229,10 +230,7 @@ class MeterClassifier:
             print('Failed to find a model named \'{}\'. Please check the model name.'.format(model_name),
                   file=sys.stderr)
             raise e
-        try:
-            self.model = load_model(file)
-        finally:
-            os.remove(file)
+        self.model = load_model(file)
 
     def estimate(self, data):
         """
@@ -293,7 +291,7 @@ def _extract_from_package(resource):
 
 def _load_model_from_github(resource):
     url = f"https://raw.githubusercontent.com/hendriks73/tempo-cnn/main/tempocnn/{resource}"
-    logging.info(f"Attempting to download model file from main branch {url}")
+    logger.info(f"Attempting to download model file from main branch {url}")
     try:
         response = urllib.request.urlopen(url)
         return response.read()
@@ -301,7 +299,7 @@ def _load_model_from_github(resource):
         # fall back to dev branch
         try:
             url = f"https://raw.githubusercontent.com/hendriks73/tempo-cnn/dev/tempocnn/{resource}"
-            logging.info(f"Attempting to download model file from dev branch {url}")
+            logger.info(f"Attempting to download model file from dev branch {url}")
             response = urllib.request.urlopen(url)
             return response.read()
         except Exception:
