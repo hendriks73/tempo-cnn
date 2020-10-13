@@ -29,7 +29,7 @@ an audio file, simply run the script
     tempo -i my_audio.wav
 
 
-You may also use the package `programmatically <#programmatic_usage>`_.
+You may also use the package `programmatically <#programmatic-usage>`_.
 
 Installation
 ============
@@ -54,7 +54,7 @@ If you rather want to install from source, clone this repo and run
 Models and Formats
 ==================
 
-You may specify other models and output formats (`mirex <http://www.music-ir.org/mirex/wiki/2018:Audio_Tempo_Estimation>`_,
+You may specify other models and output formats (`MIREX <http://www.music-ir.org/mirex/wiki/2018:Audio_Tempo_Estimation>`_,
 `JAMS <https://github.com/marl/jams>`_) via command line parameters.
 
 E.g. to create JAMS as output format and the model originally used in the ISMIR 2018
