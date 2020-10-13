@@ -318,14 +318,7 @@ def tempogram():
     sr = 11025.0
     fft_hop_length = 512.0
     log_scale = 'fma' in args.model
-    if log_scale:
-        min_bpm = 50
-        max_bpm = 500
-        max_ylim = 510
-    else:
-        min_bpm = 30
-        max_bpm = 286
-        max_ylim = 300
+    min_bpm, max_bpm, max_ylim = _get_tempogram_limits(log_scale)
 
     print('Processing file(s)', end='', flush=True)
     for file in args.audio_file:
@@ -333,19 +326,12 @@ def tempogram():
         features = read_features(file, hop_length=hop_length, zero_pad=True)
         predictions = classifier.estimate(features)
 
-        if args.norm_frame is not None:
-            norm_order = np.inf
-            if 'max' == args.norm_frame.lower():
-                norm_order = np.inf
-            elif 'l1' == args.norm_frame.lower():
-                norm_order = 1
-            elif 'l2' == args.norm_frame.lower():
-                norm_order = 2
-            else:
-                print('Unknown norm. Using max norm.', end='', flush=True)
-            predictions = (predictions.T / np.linalg.norm(predictions, ord=norm_order, axis=1)).T
+        norm_frame = args.norm_frame
+        if norm_frame is not None:
+            predictions = _norm_tempogram_frames(predictions, norm_frame)
 
-        if args.sharpen:
+        sharpen = args.sharpen
+        if sharpen:
             predictions = (predictions.T / np.max(predictions, axis=1)).T
             predictions = np.where(predictions != 1, 0, predictions)
 
@@ -357,10 +343,12 @@ def tempogram():
         fig.canvas.set_window_title('tempogram: ' + file)
         if args.png:
             fig.set_size_inches(5, 2)
+
         ax = fig.add_subplot(111)
         ax.set_ylim((0, max_ylim))
         ax.imshow(predictions.T, origin='lower', cmap='Greys', aspect='auto',
                   extent=(0, max_length_in_s, min_bpm, max_bpm))
+
         if log_scale:
             ax.set_yscale('log')
             ax.yaxis.set_major_formatter(ScalarFormatter())
@@ -370,44 +358,90 @@ def tempogram():
         ax.set_ylabel('Tempo (BPM)')
 
         if args.csv:
-            if args.sharpen:
-                # for now simple argmax, we could use quad interpolation instead
-                index = np.argmax(predictions, axis=1)
-                bpm = classifier.to_bpm(index)
-                np.savetxt(file + '.csv',
-                           bpm,
-                           fmt='%1.2f',
-                           delimiter=",",
-                           header='Predictions using model \'{}\' '
-                                  'argmax of tempo distribution '
-                                  '{}-{} BPM (column) '
-                                  'log_scale={} '
-                                  'feature frequency={} Hz '
-                                  'i.e. {} ms/feature (rows)'
-                           .format(classifier.model_name, min_bpm, max_bpm, log_scale,
-                                   1. / frame_length,
-                                   frame_length * 1000.))
-            else:
-                np.savetxt(file + '.csv',
-                           predictions,
-                           fmt='%1.6f',
-                           delimiter=",",
-                           header='Predictions using model \'{}\' '
-                                  '{}-{} BPM (columns) '
-                                  'log_scale={} '
-                                  'feature frequency={} Hz '
-                                  'i.e. {} ms/feature (rows)'
-                           .format(classifier.model_name, min_bpm, max_bpm, log_scale,
-                                   1. / frame_length,
-                                   frame_length * 1000.))
+            _write_tempogram_as_csv(predictions=predictions,
+                                    classifier=classifier,
+                                    file=file,
+                                    frame_length=frame_length,
+                                    log_scale=log_scale,
+                                    min_bpm=min_bpm,
+                                    max_bpm=max_bpm,
+                                    sharpen=sharpen)
 
         if args.png:
             plt.tight_layout()
             fig.savefig(file + '.png', dpi=300)
+
         else:
             plt.show()
 
     print('\nDone')
+
+
+def _norm_tempogram_frames(predictions=None, norm_frame=None):
+    norm_order = np.inf
+    if 'max' == norm_frame.lower():
+        norm_order = np.inf
+    elif 'l1' == norm_frame.lower():
+        norm_order = 1
+    elif 'l2' == norm_frame.lower():
+        norm_order = 2
+    else:
+        print('Unknown norm. Using max norm.', end='', flush=True)
+    predictions = (predictions.T / np.linalg.norm(predictions, ord=norm_order, axis=1)).T
+    return predictions
+
+
+def _write_tempogram_as_csv(predictions=None,
+                            classifier=None,
+                            file=None,
+                            frame_length=None,
+                            log_scale=False,
+                            min_bpm=30,
+                            max_bpm=256,
+                            sharpen=False):
+    csv_file_name = file + '.csv'
+    if sharpen:
+        # for now simple argmax, we could use quad interpolation instead
+        index = np.argmax(predictions, axis=1)
+        bpm = classifier.to_bpm(index)
+        np.savetxt(csv_file_name,
+                   bpm,
+                   fmt='%1.2f',
+                   delimiter=",",
+                   header='Predictions using model \'{}\' '
+                          'argmax of tempo distribution '
+                          '{}-{} BPM (column) '
+                          'log_scale={} '
+                          'feature frequency={} Hz '
+                          'i.e. {} ms/feature (rows)'
+                   .format(classifier.model_name, min_bpm, max_bpm, log_scale,
+                           1. / frame_length,
+                           frame_length * 1000.))
+    else:
+        np.savetxt(csv_file_name,
+                   predictions,
+                   fmt='%1.6f',
+                   delimiter=",",
+                   header='Predictions using model \'{}\' '
+                          '{}-{} BPM (columns) '
+                          'log_scale={} '
+                          'feature frequency={} Hz '
+                          'i.e. {} ms/feature (rows)'
+                   .format(classifier.model_name, min_bpm, max_bpm, log_scale,
+                           1. / frame_length,
+                           frame_length * 1000.))
+
+
+def _get_tempogram_limits(log_scale):
+    if log_scale:
+        min_bpm = 50
+        max_bpm = 500
+        max_ylim = 510
+    else:
+        min_bpm = 30
+        max_bpm = 286
+        max_ylim = 300
+    return min_bpm, max_bpm, max_ylim
 
 
 def greekfolk():
