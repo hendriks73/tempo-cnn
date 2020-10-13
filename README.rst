@@ -10,6 +10,9 @@
 .. image:: https://github.com/hendriks73/tempo-cnn/workflows/Build%20and%20Test/badge.svg
    :target: https://github.com/hendriks73/tempo-cnn/actions
 
+.. image:: https://badge.fury.io/py/tempocnn.svg
+    :target: https://badge.fury.io/py/tempocnn
+
 =========
 Tempo-CNN
 =========
@@ -25,6 +28,32 @@ an audio file, simply run the script
 
     tempo -i my_audio.wav
 
+
+You may also use the package `programmatically <#programmatic_usage>`_.
+
+Installation
+============
+
+In a clean Python 3.6 or 3.7 environment, simply run:
+
+.. code-block:: console
+
+    pip install tempocnn
+
+
+If you rather want to install from source, clone this repo and run
+``setup.py install`` using Python 3.6 or 3.7:
+
+.. code-block:: console
+
+    git clone https://github.com/hendriks73/tempo-cnn.git
+    cd tempo-cnn
+    python setup.py install
+
+
+Models and Formats
+==================
+
 You may specify other models and output formats (`mirex <http://www.music-ir.org/mirex/wiki/2018:Audio_Tempo_Estimation>`_,
 `JAMS <https://github.com/marl/jams>`_) via command line parameters.
 
@@ -34,6 +63,9 @@ paper [1]_, please run
 .. code-block:: console
 
     tempo -m ismir2018 --jams -i my_audio.wav
+
+For MIREX-style output, add the ``--mirex`` parameter.
+
 
 DeepTemp Models
 ===============
@@ -131,7 +163,7 @@ folk music [2]_. The corresponding models are named ``fma2018`` (for tempo) and 
 Programmatic Usage
 ==================
 
-After installation via ``pip install .`` or ``pip install tempocnn``, you may use
+After `installation <#installation>`_, you may use
 the package programmatically.
 
 Example for *global* tempo estimation:
@@ -179,26 +211,6 @@ Example for *local* tempo estimation:
     max_predictions = np.argmax(local_tempo_classes, axis=1)
     local_tempi = classifier.to_bpm(max_predictions)
     print(f"Estimated local tempo classes: {local_tempi}")
-
-
-Installation
-============
-
-In a clean Python 3.6 or 3.7 environment, simply run:
-
-.. code-block:: console
-
-    pip install tempocnn
-
-
-If you rather want to install from source, clone this repo and run
-``setup.py install`` using Python 3.6 or 3.7:
-
-.. code-block:: console
-
-    git clone https://github.com/hendriks73/tempo-cnn.git
-    cd tempo-cnn
-    python setup.py install
 
 
 License
@@ -250,6 +262,7 @@ Mazurka models:
       Title = {Modeling and Estimating Local Tempo: A Case Study on Chopin’s Mazurkas},
       Author = {Hendrik Schreiber and Frank Zalkow and Meinard M{\"u}ller},
       Booktitle = {Proceedings of the 21th International Society for Music Information Retrieval Conference ({ISMIR})},
+      Pages = {773--779},
       Year = {2020},
       Address = {Montreal, QC, Canada}
    }
