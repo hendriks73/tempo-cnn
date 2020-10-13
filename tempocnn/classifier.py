@@ -73,7 +73,7 @@ class TempoClassifier:
         self.model_name = model_name
 
         # mazurka and deeptemp/shallowtempo models use a different kind of normalization
-        self.normalize = std_normalizer if 'dt_maz_v' in self.model_name \
+        self.normalize = std_normalizer if 'dt_maz' in self.model_name \
                                            or 'deeptemp' in self.model_name \
                                            or 'deepsquare' in self.model_name \
                                            or 'shallowtemp' in self.model_name \

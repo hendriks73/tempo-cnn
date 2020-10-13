@@ -21,14 +21,44 @@ def tempo():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter, description='''
     The program 'tempo' estimates a global tempo for a given file.
-    The underlying algorithm is described in detail in:
+    The underlying algorithm and the model ismir2018 is described in detail in:
 
     Hendrik Schreiber, Meinard Müller,
     "A single-step approach to musical meter estimation using a
     convolutional neural network"
     Proceedings of the 19th International Society for Music Information
     Retrieval Conference (ISMIR), Paris, France, Sept. 2018.
+    
+    Models fcn and cnn are from:
+    
+    Hendrik Schreiber,
+    "CNN-based tempo estimation"
+    Music Information Retrieval Evaluation eXchange (MIREX),
+    Paris, France, 2018.
 
+    Model fma2018 is from:
+    
+    Hendrik Schreiber,
+    "Technical Report: Tempo and Meter Estimation for Greek Folk Music Using
+    Convolutional Neural Networks and Transfer Learning"
+    8th International Workshop on Folk Music Analysis (FMA),
+    Thessaloniki, Greece, June 2018.
+    
+    Models deeptemp*, deepsquare* and shallowtemp* are from:
+    
+    Hendrik Schreiber, Meinard Müller,
+    "Musical Tempo and Key Estimation using Convolutional
+    Neural Networks with Directional Filters"
+    Sound and Music Computing Conference (SMC),
+    Málaga, Spain, 2019.
+
+    Models mazurka, dt_maz_* are from:
+
+    Hendrik Schreiber, Frank Zalkow, Meinard Müller,
+    "Modeling and Estimating Local Tempo: A Case Study on Chopin’s Mazurkas"
+    Proceedings of the 21st International Society for Music Information
+    Retrieval Conference (ISMIR), Montréal, QC, Canada, Oct. 2020.
+    
     License: GNU Affero General Public License v3
     ''')
 
@@ -41,7 +71,18 @@ def tempo():
     parser.add_argument('-m', '--model',
                         nargs='?',
                         default='fcn',
-                        help='model name [ismir2018|fma2018|cnn|fcn|mazurka|deeptemp|deepsquare|shallowtemp], defaults to fcn')
+                        help='model name [ismir2018|fma2018|cnn|fcn|mazurka|deeptemp|deepsquare|shallowtemp], '
+                             'defaults to "fcn." For more sepcific model names, please check the repo.')
+    parser.add_argument('-c', '--cont',
+                        help='continue after error, if multiple files are processed',
+                        action='store_true')
+
+    extensions = parser.add_mutually_exclusive_group()
+    extensions.add_argument('-e', '--extension',
+                            help='append given extension to original file name for results')
+    extensions.add_argument('-re', '--replace_extension',
+                            help='replace the file existing with the given one')
+
     output_format = parser.add_mutually_exclusive_group()
     output_format.add_argument('--mirex',
                                help='use MIREX format for output',
@@ -49,22 +90,17 @@ def tempo():
     output_format.add_argument('--jams',
                                help='use JAMS format for output',
                                action="store_true")
+
     parser.add_argument('-i', '--input',
                         nargs='+',
                         help='input audio file(s) to process')
 
-    output_options = parser.add_mutually_exclusive_group()
     output_location = parser.add_mutually_exclusive_group()
     output_location.add_argument('-o', '--output',
                                  nargs='*',
                                  help='output file(s)')
     output_location.add_argument('-d', '--outputdir',
                                  help='output directory')
-    output_options.add_argument('-e', '--extension',
-                                help='append given extension to original file name for results')
-    output_options.add_argument('-c', '--cont',
-                                help='continue after error, if multiple files are processed',
-                                action='store_true')
 
     # parse arguments
     args = parser.parse_args()
@@ -102,7 +138,7 @@ def tempo():
                     result.file_metadata.duration = track_duration
                     result.file_metadata.identifiers = {'file': basename(input_file)}
                     tempo_a = jams.Annotation(namespace='tempo', time=0, duration=track_duration)
-                    tempo_a.annotation_metadata = jams.AnnotationMetadata(version={package_version},
+                    tempo_a.annotation_metadata = jams.AnnotationMetadata(version=package_version,
                                                                           annotation_tools='schreiber tempo-cnn (model=' + args.model + '), https://github.com/hendriks73/tempo-cnn',
                                                                           data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to Musical Tempo Estimation Using a Convolutional Neural Network. In Proceedings of the 19th International Society for Music Information Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
                     tempo_a.append(time=0.0,
@@ -128,6 +164,9 @@ def tempo():
                 output_file = join(file_dir, base + '.jams')
             elif args.extension is not None:
                 output_file = join(file_dir, file_name + args.extension)
+            elif args.replace_extension is not None:
+                base, file_extension = splitext(file_name)
+                output_file = join(file_dir, base + args.replace_extension)
             elif args.output is not None and index < len(args.output):
                 output_file = args.output[index]
             if args.jams:
@@ -154,13 +193,43 @@ def tempogram():
         formatter_class=argparse.RawDescriptionHelpFormatter, description='''
     The program 'tempogram' estimates local tempi for a given file and displays
     their probability distributions in a graph. 
-    The underlying algorithm is described in detail in:
+    The underlying algorithm and the model ismir2018 is described in detail in:
 
     Hendrik Schreiber, Meinard Müller,
     "A single-step approach to musical meter estimation using a
     convolutional neural network"
     Proceedings of the 19th International Society for Music Information
     Retrieval Conference (ISMIR), Paris, France, Sept. 2018.
+    
+    Models fcn and cnn are from:
+    
+    Hendrik Schreiber,
+    "CNN-based tempo estimation"
+    Music Information Retrieval Evaluation eXchange (MIREX),
+    Paris, France, 2018.
+
+    Model fma2018 is from:
+    
+    Hendrik Schreiber,
+    "Technical Report: Tempo and Meter Estimation for Greek Folk Music Using
+    Convolutional Neural Networks and Transfer Learning"
+    8th International Workshop on Folk Music Analysis (FMA),
+    Thessaloniki, Greece, June 2018.
+    
+    Models deeptemp*, deepsquare* and shallowtemp* are from:
+    
+    Hendrik Schreiber, Meinard Müller,
+    "Musical Tempo and Key Estimation using Convolutional
+    Neural Networks with Directional Filters"
+    Sound and Music Computing Conference (SMC),
+    Málaga, Spain, 2019.
+
+    Models mazurka, dt_maz_* are from:
+
+    Hendrik Schreiber, Frank Zalkow, Meinard Müller,
+    "Modeling and Estimating Local Tempo: A Case Study on Chopin’s Mazurkas"
+    Proceedings of the 21st International Society for Music Information
+    Retrieval Conference (ISMIR), Montréal, QC, Canada, Oct. 2020.
 
     License: GNU Affero General Public License v3
     ''')
@@ -428,3 +497,7 @@ def meter():
             with open(output_file, mode='w') as f:
                 f.write(result + '\n')
     print('\nDone')
+
+
+if __name__ == "__main__":
+    tempo()
