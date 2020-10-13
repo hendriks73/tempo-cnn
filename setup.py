@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# encoding: utf-8
 """
 This file contains the setup for setuptools to distribute everything as a
 (PyPI) package.
@@ -9,14 +8,9 @@ This file contains the setup for setuptools to distribute everything as a
 from setuptools import setup, find_packages
 from importlib.machinery import SourceFileLoader
 
-import glob
-
 # define version
 version = SourceFileLoader("tempocnn.version", "tempocnn/version.py").load_module()
 version = version.__version__
-
-# define scripts to be installed by the PyPI package
-scripts = glob.glob('bin/*')
 
 # define the models to be included in the PyPI package
 # do not package some large models, to stay below PyPI 100mb threshold
@@ -81,13 +75,13 @@ setup(name='tempocnn',
       packages=find_packages(exclude=['test', 'docs']),
       package_data={'tempocnn': package_data},
       exclude_package_data={'': ['tests', 'docs']},
-      scripts=scripts,
       python_requires='>=3.6',
       install_requires=requirements,
       extras_require={
           "testing": [
               "pytest",
               "coverage",
+              "pytest-console-scripts",
           ]
       },
       classifiers=['Development Status :: 3 - Alpha',
@@ -96,5 +90,13 @@ setup(name='tempocnn',
                    'Environment :: Console',
                    'License :: OSI Approved :: GNU Affero General Public License v3',
                    'Topic :: Multimedia :: Sound/Audio :: Analysis',
-                   'Topic :: Scientific/Engineering :: Artificial Intelligence']
-      )
+                   'Topic :: Scientific/Engineering :: Artificial Intelligence'],
+      entry_points = {
+          'console_scripts': [
+              'tempo=tempocnn.commands:tempo',
+              'tempogram=tempocnn.commands:tempogram',
+              'meter=tempocnn.commands:meter',
+              'greekfolk=tempocnn.commands:greekfolk',
+          ],
+      },
+)

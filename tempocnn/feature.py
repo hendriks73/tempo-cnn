@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 """
 Feature loading from audio files.
 

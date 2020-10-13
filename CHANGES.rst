@@ -12,6 +12,9 @@ Changes
  - Added Pypi workflow.
  - Cache models locally.
  - Load models from GitHub.
+ - Turned off TensorFlow debug logging.
+ - Migrated scripts to entry points.
+ - Removed charset encoding comments.
 
 0.0.4:
  - Added support for DeepTemp, DeepSquare, and ShallowTemp models.
