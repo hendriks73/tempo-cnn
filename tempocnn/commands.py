@@ -28,24 +28,24 @@ def tempo():
     convolutional neural network"
     Proceedings of the 19th International Society for Music Information
     Retrieval Conference (ISMIR), Paris, France, Sept. 2018.
-    
+
     Models fcn and cnn are from:
-    
+
     Hendrik Schreiber,
     "CNN-based tempo estimation"
     Music Information Retrieval Evaluation eXchange (MIREX),
     Paris, France, 2018.
 
     Model fma2018 is from:
-    
+
     Hendrik Schreiber,
     "Technical Report: Tempo and Meter Estimation for Greek Folk Music Using
     Convolutional Neural Networks and Transfer Learning"
     8th International Workshop on Folk Music Analysis (FMA),
     Thessaloniki, Greece, June 2018.
-    
+
     Models deeptemp*, deepsquare* and shallowtemp* are from:
-    
+
     Hendrik Schreiber, Meinard Müller,
     "Musical Tempo and Key Estimation using Convolutional
     Neural Networks with Directional Filters"
@@ -58,7 +58,7 @@ def tempo():
     "Modeling and Estimating Local Tempo: A Case Study on Chopin’s Mazurkas"
     Proceedings of the 21st International Society for Music Information
     Retrieval Conference (ISMIR), Montréal, QC, Canada, Oct. 2020.
-    
+
     License: GNU Affero General Public License v3
     ''')
 
@@ -138,9 +138,14 @@ def tempo():
                     result.file_metadata.duration = track_duration
                     result.file_metadata.identifiers = {'file': basename(input_file)}
                     tempo_a = jams.Annotation(namespace='tempo', time=0, duration=track_duration)
-                    tempo_a.annotation_metadata = jams.AnnotationMetadata(version=package_version,
-                                                                          annotation_tools='schreiber tempo-cnn (model=' + args.model + '), https://github.com/hendriks73/tempo-cnn',
-                                                                          data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to Musical Tempo Estimation Using a Convolutional Neural Network. In Proceedings of the 19th International Society for Music Information Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
+                    tempo_a.annotation_metadata = jams.AnnotationMetadata(
+                        version=package_version,
+                        annotation_tools=f'schreiber tempo-cnn (model={args.model}), '
+                                         f'https://github.com/hendriks73/tempo-cnn',
+                        data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to '
+                                    'Musical Tempo Estimation Using a Convolutional Neural Network. '
+                                    'In Proceedings of the 19th International Society for Music Information '
+                                    'Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
                     tempo_a.append(time=0.0,
                                    duration=track_duration,
                                    value=t1,
@@ -192,7 +197,7 @@ def tempogram():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter, description='''
     The program 'tempogram' estimates local tempi for a given file and displays
-    their probability distributions in a graph. 
+    their probability distributions in a graph.
     The underlying algorithm and the model ismir2018 is described in detail in:
 
     Hendrik Schreiber, Meinard Müller,
@@ -497,7 +502,3 @@ def meter():
             with open(output_file, mode='w') as f:
                 f.write(result + '\n')
     print('\nDone')
-
-
-if __name__ == "__main__":
-    tempo()

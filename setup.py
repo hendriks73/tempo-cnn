@@ -18,8 +18,8 @@ package_data = [
     'models/cnn.h5',
     'models/fcn.h5',
     'models/ismir2018.h5',
-#    'models/fma2018.h5',
-#    'models/fma2018-meter.h5',
+    # 'models/fma2018.h5',
+    # 'models/fma2018-meter.h5',
     'models/dt_maz_m_fold0.h5',
     'models/dt_maz_m_fold1.h5',
     'models/dt_maz_m_fold2.h5',
@@ -34,19 +34,19 @@ package_data = [
     'models/deepsquare_k2.h5',
     'models/deepsquare_k4.h5',
     'models/deepsquare_k8.h5',
-#    'models/deepsquare_k16.h5',
-#    'models/deepsquare_k24.h5',
+    # 'models/deepsquare_k16.h5',
+    # 'models/deepsquare_k24.h5',
     'models/deeptemp_k2.h5',
     'models/deeptemp_k4.h5',
     'models/deeptemp_k8.h5',
-#    'models/deeptemp_k16.h5',
-#    'models/deeptemp_k24.h5',
+    # 'models/deeptemp_k16.h5',
+    # 'models/deeptemp_k24.h5',
     'models/shallowtemp_k1.h5',
     'models/shallowtemp_k2.h5',
     'models/shallowtemp_k4.h5',
     'models/shallowtemp_k6.h5',
-#    'models/shallowtemp_k8.h5',
-#    'models/shallowtemp_k12.h5',
+    # 'models/shallowtemp_k8.h5',
+    # 'models/shallowtemp_k12.h5',
 ]
 
 # requirements
@@ -91,12 +91,12 @@ setup(name='tempocnn',
                    'License :: OSI Approved :: GNU Affero General Public License v3',
                    'Topic :: Multimedia :: Sound/Audio :: Analysis',
                    'Topic :: Scientific/Engineering :: Artificial Intelligence'],
-      entry_points = {
+      entry_points={
           'console_scripts': [
               'tempo=tempocnn.commands:tempo',
               'tempogram=tempocnn.commands:tempogram',
               'meter=tempocnn.commands:meter',
               'greekfolk=tempocnn.commands:greekfolk',
           ],
-      },
-)
+      }
+      )
