@@ -105,20 +105,12 @@ def tempo():
     # parse arguments
     args = parser.parse_args()
 
-    if args.output is not None and 0 < len(args.output) != len(args.input):
-        print('Number of input files ({}) must match number of output files ({}).\nInput={}\nOutput={}'
-              .format(len(args.input), len(args.output), args.input, args.output), file=sys.stderr)
-        parser.print_help(file=sys.stderr)
-        sys.exit(1)
-
-    if args.input is None:
-        print('No input files given.', file=sys.stderr)
-        parser.print_help(file=sys.stderr)
-        sys.exit(1)
+    _check_tempo_args(args, parser)
 
     # load model
-    print('Loading model \'{}\'...'.format(args.model))
-    classifier = TempoClassifier(args.model)
+    model = args.model
+    print('Loading model \'{}\'...'.format(model))
+    classifier = TempoClassifier(model)
     print('Loaded model with {} parameters.'.format(classifier.model.count_params()))
 
     print('Processing file(s)', end='', flush=True)
@@ -127,60 +119,27 @@ def tempo():
             print('.', end='', flush=True)
             features = read_features(input_file)
 
-            if args.mirex or args.jams:
+            create_jam = args.jams
+            create_mirex = args.mirex
+
+            if create_mirex or create_jam:
                 t1, t2, s1 = classifier.estimate_mirex(features, interpolate=args.interpolate)
-                if args.mirex:
+                if create_mirex:
                     result = str(t1) + '\t' + str(t2) + '\t' + str(s1)
                 else:
-                    result = jams.JAMS()
-                    y, sr = librosa.load(input_file)
-                    track_duration = librosa.get_duration(y=y, sr=sr)
-                    result.file_metadata.duration = track_duration
-                    result.file_metadata.identifiers = {'file': basename(input_file)}
-                    tempo_a = jams.Annotation(namespace='tempo', time=0, duration=track_duration)
-                    tempo_a.annotation_metadata = jams.AnnotationMetadata(
-                        version=package_version,
-                        annotation_tools=f'schreiber tempo-cnn (model={args.model}), '
-                                         f'https://github.com/hendriks73/tempo-cnn',
-                        data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to '
-                                    'Musical Tempo Estimation Using a Convolutional Neural Network. '
-                                    'In Proceedings of the 19th International Society for Music Information '
-                                    'Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
-                    tempo_a.append(time=0.0,
-                                   duration=track_duration,
-                                   value=t1,
-                                   confidence=s1)
-                    tempo_a.append(time=0.0,
-                                   duration=track_duration,
-                                   value=t2,
-                                   confidence=(1 - s1))
-                    result.annotations.append(tempo_a)
+                    result = _create_tempo_jam(input_file, model, s1, t1, t2)
             else:
                 tempo = classifier.estimate_tempo(features, interpolate=args.interpolate)
                 result = str(tempo)
 
-            output_file = None
-            file_dir = dirname(input_file)
-            file_name = basename(input_file)
-            if args.outputdir is not None:
-                file_dir = args.outputdir
-            if args.jams:
-                base, file_extension = splitext(file_name)
-                output_file = join(file_dir, base + '.jams')
-            elif args.extension is not None:
-                output_file = join(file_dir, file_name + args.extension)
-            elif args.replace_extension is not None:
-                base, file_extension = splitext(file_name)
-                output_file = join(file_dir, base + args.replace_extension)
-            elif args.output is not None and index < len(args.output):
-                output_file = args.output[index]
-            if args.jams:
-                result.save(output_file)
-            elif output_file is None:
-                print('\n' + result)
-            else:
-                with open(output_file, mode='w') as file_name:
-                    file_name.write(result + '\n')
+            _write_tempo_result(result=result,
+                                input_file=input_file,
+                                output_dir=args.outputdir,
+                                output_list=args.output,
+                                index=index,
+                                append_extension=args.extension,
+                                replace_extension=args.replace_extension,
+                                create_jam=create_jam)
         except Exception as e:
             if not args.cont:
                 print('\nAn error occurred while processing \'{}\':\n{}\n'.format(input_file, e), file=sys.stderr)
@@ -188,6 +147,93 @@ def tempo():
             else:
                 print('E({})'.format(input_file), end='', flush=True)
     print('\nDone')
+
+
+def _write_tempo_result(result,
+                        input_file=None,
+                        output_dir=None,
+                        output_list=None,
+                        index=0,
+                        append_extension=None, replace_extension=None,
+                        create_jam=False):
+    """
+    Write the tempo analysis results to a file.
+
+    :param result: results
+    :param input_file: input file for these results
+    :param output_dir: output directory
+    :param output_list: list of output file names
+    :param index: index in the ``output_list``
+    :param append_extension: file extension to append
+    :param replace_extension: file extension to used for replacing an existing extension
+    :param create_jam: create JAM or not
+    """
+
+    file_dir = dirname(input_file)
+    file_name = basename(input_file)
+    if output_dir is not None:
+        file_dir = output_dir
+
+    # determine output_file name
+    output_file = None
+    if create_jam:
+        base, file_extension = splitext(file_name)
+        output_file = join(file_dir, base + '.jams')
+    elif append_extension is not None:
+        output_file = join(file_dir, file_name + append_extension)
+    elif replace_extension is not None:
+        base, file_extension = splitext(file_name)
+        output_file = join(file_dir, base + replace_extension)
+    elif output_list is not None and index < len(output_list):
+        output_file = output_list[index]
+
+    # actually writing the output
+    if create_jam:
+        result.save(output_file)
+    elif output_file is None:
+        print('\n' + result)
+    else:
+        with open(output_file, mode='w') as file_name:
+            file_name.write(result + '\n')
+
+
+def _create_tempo_jam(input_file, model, s1, t1, t2):
+    result = jams.JAMS()
+    y, sr = librosa.load(input_file)
+    track_duration = librosa.get_duration(y=y, sr=sr)
+    result.file_metadata.duration = track_duration
+    result.file_metadata.identifiers = {'file': basename(input_file)}
+    tempo_a = jams.Annotation(namespace='tempo', time=0, duration=track_duration)
+    tempo_a.annotation_metadata = jams.AnnotationMetadata(
+        version=package_version,
+        annotation_tools=f'schreiber tempo-cnn (model={model}), '
+                         f'https://github.com/hendriks73/tempo-cnn',
+        data_source='Hendrik Schreiber, Meinard Müller. A Single-Step Approach to '
+                    'Musical Tempo Estimation Using a Convolutional Neural Network. '
+                    'In Proceedings of the 19th International Society for Music Information '
+                    'Retrieval Conference (ISMIR), Paris, France, Sept. 2018.')
+    tempo_a.append(time=0.0,
+                   duration=track_duration,
+                   value=t1,
+                   confidence=s1)
+    tempo_a.append(time=0.0,
+                   duration=track_duration,
+                   value=t2,
+                   confidence=(1 - s1))
+    result.annotations.append(tempo_a)
+    return result
+
+
+def _check_tempo_args(args, parser):
+    if args.output is not None and 0 < len(args.output) != len(args.input):
+        print('Number of input files ({}) must match number of output files ({}).\nInput={}\nOutput={}'
+              .format(len(args.input), len(args.output), args.input, args.output), file=sys.stderr)
+        parser.print_help(file=sys.stderr)
+        sys.exit(1)
+    if args.input is None:
+        print('No input files given.', file=sys.stderr)
+        parser.print_help(file=sys.stderr)
+        sys.exit(1)
 
 
 def tempogram():
@@ -205,24 +251,24 @@ def tempogram():
     convolutional neural network"
     Proceedings of the 19th International Society for Music Information
     Retrieval Conference (ISMIR), Paris, France, Sept. 2018.
-    
+
     Models fcn and cnn are from:
-    
+
     Hendrik Schreiber,
     "CNN-based tempo estimation"
     Music Information Retrieval Evaluation eXchange (MIREX),
     Paris, France, 2018.
 
     Model fma2018 is from:
-    
+
     Hendrik Schreiber,
     "Technical Report: Tempo and Meter Estimation for Greek Folk Music Using
     Convolutional Neural Networks and Transfer Learning"
     8th International Workshop on Folk Music Analysis (FMA),
     Thessaloniki, Greece, June 2018.
-    
+
     Models deeptemp*, deepsquare* and shallowtemp* are from:
-    
+
     Hendrik Schreiber, Meinard Müller,
     "Musical Tempo and Key Estimation using Convolutional
     Neural Networks with Directional Filters"
