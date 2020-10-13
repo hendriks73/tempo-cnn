@@ -7,12 +7,16 @@
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3553592.svg
    :target: https://doi.org/10.5281/zenodo.3553592
 
+.. image:: https://github.com/hendriks73/tempo-cnn/workflows/Build%20and%20Test/badge.svg
+   :target: https://github.com/hendriks73/tempo-cnn/actions
+
 =========
 Tempo-CNN
 =========
 
 Tempo-CNN is a simple CNN-based framework for estimating temporal properties
-of music tracks.
+of music tracks featuring trained models from several publications
+[1]_ [2]_ [3]_ [4]_.
 
 First and foremost, Tempo-CNN is a tempo estimator. To determine the global tempo of
 an audio file, simply run the script
@@ -25,16 +29,16 @@ You may specify other models and output formats (`mirex <http://www.music-ir.org
 `JAMS <https://github.com/marl/jams>`_) via command line parameters.
 
 E.g. to create JAMS as output format and the model originally used in the ISMIR 2018
-paper [1], please run
+paper [1]_, please run
 
 .. code-block:: console
 
     tempo -m ismir2018 --jams -i my_audio.wav
 
 DeepTemp Models
----------------
+===============
 
-To use one of the ``DeepTemp`` models from [3] (see also repo
+To use one of the ``DeepTemp`` models from [3]_ (see also repo
 `directional_cnns <https://github.com/hendriks73/directional_cnns>`_), run
 
 .. code-block:: console
@@ -53,9 +57,9 @@ if you want to use a higher capacity model (some ``k``-values are supported).
 Note that some models may be downloaded (and cached) at execution time.
 
 Mazurka Models
---------------
+==============
 
-To use DT-Maz models from [4], run
+To use DT-Maz models from [4]_, run
 
 .. code-block:: console
 
@@ -71,10 +75,10 @@ So to use fold 3 from the *M*-split, use
 
 Note that Mazurka models may be used to estimate a global tempo, but were
 actually trained to create tempograms (local tempo, see below) for Chopin
-Mazurkas [4].
+Mazurkas [4]_.
 
 Batch Processing
-----------------
+================
 
 For batch processing, you may want to run ``tempo`` like this:
 
@@ -87,7 +91,7 @@ and write the results to individual files in ``/output_dir/``. Because the model
 loaded once, this method of processing is much faster than individual program starts.
 
 Interpolation
--------------
+=============
 
 To increase accuracy for greater than integer-precision, you may want to enable quadratic interpolation.
 You can do so by setting the ``--interpolate`` flag. Obviously, this only makes sense for tracks
@@ -98,7 +102,7 @@ with a very stable tempo:
     tempo -m ismir2018 --interpolate -i my_audio.wav
 
 Tempogram
----------
+=========
 
 Instead of estimating a global tempo, Tempo-CNN can also estimate local tempi in the
 form of a tempogram. This can be useful for identifying tempo drift.
@@ -117,7 +121,7 @@ You may use the ``--csv`` option to export local tempo estimates in a parseable 
 The parameters ``--sharpen`` and ``--norm-frame`` let you post-process the image.
 
 Tempo-CNN provides experimental support for temporal property estimation of Greek
-folk music [2]. The corresponding models are named ``fma2018`` (for tempo) and ``fma2018-meter``
+folk music [2]_. The corresponding models are named ``fma2018`` (for tempo) and ``fma2018-meter``
 (for meter). To estimate the meter's numerator, run
 
 .. code-block:: console
