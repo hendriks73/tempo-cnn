@@ -2,6 +2,8 @@
 Changes
 =======
 
+0.0.6:
+
 0.0.5:
  - Moved to TensorFlow 1.15.4.
  - Consolidated version info.
