@@ -116,6 +116,19 @@ Note that Mazurka models may be used to estimate a global tempo, but were
 actually trained to create tempograms (local tempo, see below) for Chopin
 Mazurkas [4]_.
 
+While it's cumbersome to list the split definitions for the Version folds,
+the Mazurka folds are easily defined:
+
+- ``fold0`` was tested on ``Chopin_Op068No3`` and validated on ``Chopin_Op017No4``
+- ``fold1`` was tested on ``Chopin_Op017No4`` and validated on ``Chopin_Op024No2``
+- ``fold2`` was tested on ``Chopin_Op024No2`` and validated on ``Chopin_Op030No2``
+- ``fold3`` was tested on ``Chopin_Op030No2`` and validated on ``Chopin_Op063No3``
+- ``fold4`` was tested on ``Chopin_Op063No3`` and validated on ``Chopin_Op068No3``
+
+The networks were trained on recordings of the three remaining Mazurkas.
+In essence this means, DO NOT estimate the local tempo for ``Chopin_Op024No2`` using
+``dt_maz_m_fold0``, because `Chopin_Op024No2`` was used in training.
+
 Batch Processing
 ================
 
