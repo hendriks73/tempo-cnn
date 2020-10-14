@@ -113,7 +113,7 @@ So to use fold 3 from the *M*-split, use
     tempo -m dt_maz_m_fold3 -i my_audio.wav
 
 Note that Mazurka models may be used to estimate a global tempo, but were
-actually trained to create tempograms (local tempo, see below) for Chopin
+actually trained to create `tempograms <#tempogram>`_ for Chopin
 Mazurkas [4]_.
 
 While it's cumbersome to list the split definitions for the Version folds,
@@ -171,6 +171,10 @@ and output formats are available.
 You may use the ``--csv`` option to export local tempo estimates in a parseable format and the
 ``--hop-length`` option to change temporal resolution.
 The parameters ``--sharpen`` and ``--norm-frame`` let you post-process the image.
+
+
+Greek Folk
+==========
 
 Tempo-CNN provides experimental support for temporal property estimation of Greek
 folk music [2]_. The corresponding models are named ``fma2018`` (for tempo) and ``fma2018-meter``
