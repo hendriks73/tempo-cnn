@@ -126,8 +126,8 @@ the Mazurka folds are easily defined:
 - ``fold4`` was tested on ``Chopin_Op063No3`` and validated on ``Chopin_Op068No3``
 
 The networks were trained on recordings of the three remaining Mazurkas.
-In essence this means, DO NOT estimate the local tempo for ``Chopin_Op024No2`` using
-``dt_maz_m_fold0``, because `Chopin_Op024No2`` was used in training.
+In essence this means, **do not** estimate the local tempo for ``Chopin_Op024No2`` using
+``dt_maz_m_fold0``, because ``Chopin_Op024No2`` was used in training.
 
 Batch Processing
 ================
