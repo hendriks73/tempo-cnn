@@ -2,6 +2,20 @@
 Changes
 =======
 
+0.0.5:
+ - Moved to TensorFlow 1.15.4.
+ - Consolidated version info.
+ - Consolidated requirements.
+ - Switched to pytest.
+ - Officially support Python 3.7.
+ - Enabled GitHub actions for packaging and testing.
+ - Added Pypi workflow.
+ - Cache models locally.
+ - Load models from GitHub.
+ - Turned off TensorFlow debug logging.
+ - Migrated scripts to entry points.
+ - Removed charset encoding comments.
+
 0.0.4:
  - Added support for DeepTemp, DeepSquare, and ShallowTemp models.
  - Added support for Mazurka models.
