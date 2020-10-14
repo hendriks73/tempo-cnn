@@ -21,15 +21,22 @@ Tempo-CNN is a simple CNN-based framework for estimating temporal properties
 of music tracks featuring trained models from several publications
 [1]_ [2]_ [3]_ [4]_.
 
-First and foremost, Tempo-CNN is a tempo estimator. To determine the global tempo of
+First and foremost, Tempo-CNN is a tempo estimator. To determine the *global* tempo of
 an audio file, simply run the script
 
 .. code-block:: console
 
     tempo -i my_audio.wav
 
+To create a *local* tempo `"tempogram" <#tempogram>`_, run
 
-You may also use the package `programmatically <#programmatic-usage>`_.
+.. code-block:: console
+
+    tempogram my_audio.wav
+
+For a complete list of options, run either script with the parameter ``--help``.
+
+For programmatic use via the Python API, please see `here <#programmatic-usage>`_.
 
 Installation
 ============
