@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.0.7:
+
+
 0.0.6:
  - Require h5py<3.0.0, to avoid model loading issues.
 
