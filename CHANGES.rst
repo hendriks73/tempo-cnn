@@ -3,7 +3,8 @@ Changes
 =======
 
 0.0.7:
-
+ - Added DOIs to bibtex entries.
+ - Added README DOI badge for SMC paper.
 
 0.0.6:
  - Require h5py<3.0.0, to avoid model loading issues.

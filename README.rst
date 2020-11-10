@@ -7,6 +7,9 @@
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3553592.svg
    :target: https://doi.org/10.5281/zenodo.3553592
 
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3249250.svg
+   :target: https://doi.org/10.5281/zenodo.3249250
+
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.4245546.svg
    :target: https://doi.org/10.5281/zenodo.4245546
 
@@ -278,7 +281,9 @@ ShallowTemp, DeepTemp, and DeepSquare models:
       Booktitle = {Proceedings of the Sound and Music Computing Conference ({SMC})},
       Pages = {47--54},
       Year = {2019},
-      Address = {M{\'a}laga, Spain}
+      Address = {M{\'a}laga, Spain},
+      doi = {10.5281/zenodo.3249250},
+      url = {https://doi.org/10.5281/zenodo.3249250}
    }
 
 Mazurka models:
@@ -291,7 +296,9 @@ Mazurka models:
       Booktitle = {Proceedings of the 21th International Society for Music Information Retrieval Conference ({ISMIR})},
       Pages = {773--779},
       Year = {2020},
-      Address = {Montreal, QC, Canada}
+      Address = {Montreal, QC, Canada},
+      doi = {10.5281/zenodo.4245546},
+      url = {https://doi.org/10.5281/zenodo.4245546}
    }
 
 References
