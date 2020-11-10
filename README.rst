@@ -7,6 +7,9 @@
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3553592.svg
    :target: https://doi.org/10.5281/zenodo.3553592
 
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.4245546.svg
+   :target: https://doi.org/10.5281/zenodo.4245546
+
 .. image:: https://github.com/hendriks73/tempo-cnn/workflows/Build%20and%20Test/badge.svg
    :target: https://github.com/hendriks73/tempo-cnn/actions
 
