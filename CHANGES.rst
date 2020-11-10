@@ -3,6 +3,7 @@ Changes
 =======
 
 0.0.6:
+ - Require h5py<3.0.0, to avoid model loading issues.
 
 0.0.5:
  - Moved to TensorFlow 1.15.4.
