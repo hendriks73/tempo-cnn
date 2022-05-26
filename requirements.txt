@@ -1,4 +1,4 @@
-tensorflow==1.15.4
+tensorflow==2.7.2
 scipy>=1.0.1
 librosa>=0.6.2
 jams>=0.3.1
