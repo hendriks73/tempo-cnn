@@ -1,7 +1,9 @@
 tensorflow==1.15.4
-scipy>=1.0.1
+protobuf<3.19.0
+scipy>=1.5.3
 librosa>=0.6.2
 jams>=0.3.1
 matplotlib>=3.0.0
 h5py>=2.7.0,<3.0.0
-setuptools>=41.0.0
+setuptools>=65.5.1
+

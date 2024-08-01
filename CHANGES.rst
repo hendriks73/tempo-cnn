@@ -5,6 +5,9 @@ Changes
 0.0.7:
  - Added DOIs to bibtex entries.
  - Added README DOI badge for SMC paper.
+ - Moved to TensorFlow 1.15.5.
+ - Added appropriate protobuf dependency.
+ - Moved to scipy 1.5.3.
 
 0.0.6:
  - Require h5py<3.0.0, to avoid model loading issues.
