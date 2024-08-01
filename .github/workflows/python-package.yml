@@ -13,6 +13,8 @@ on:
       - dev
       - main
 
+  workflow_dispatch:
+
 jobs:
   build:
 
