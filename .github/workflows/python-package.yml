@@ -22,9 +22,9 @@ jobs:
         python-version: [ 3.6, 3.7 ]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -46,14 +46,14 @@ jobs:
           coverage report -m
           coverage xml -o coverage${{ matrix.python-version }}.xml
       - name: Upload pytest test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: pytest-results-${{ matrix.python-version }}
           path: pytest_report${{ matrix.python-version }}.xml
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ always() }}
       - name: Upload coverageresults
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.python-version }}
           path: coverage${{ matrix.python-version }}.xml
