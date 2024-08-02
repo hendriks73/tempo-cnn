@@ -11,8 +11,12 @@ on:
 
 jobs:
   deploy:
-
     runs-on: ubuntu-20.04
+    # Specifying a GitHub environment is optional, but strongly encouraged
+    # environment: release
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
 
     steps:
     - uses: actions/checkout@v4
@@ -25,12 +29,9 @@ jobs:
         sudo apt-get install libsndfile1
         sudo apt-get install ffmpeg
         python -m pip install --upgrade pip
-        pip install setuptools wheel twine
+        pip install setuptools wheel
         pip install .[testing]
-    - name: Build and publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
+    - name: Build
+      run: python setup.py sdist bdist_wheel
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
