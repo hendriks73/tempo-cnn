@@ -2,6 +2,9 @@
 Changes
 =======
 
+0.0.8:
+ - Moved to TensorFlow 2.4.1 and Python 3.8
+
 0.0.7:
  - Added DOIs to bibtex entries.
  - Added README DOI badge for SMC paper.
