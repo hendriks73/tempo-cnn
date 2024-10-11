@@ -75,7 +75,7 @@ setup(name='tempocnn',
       packages=find_packages(exclude=['test', 'docs']),
       package_data={'tempocnn': package_data},
       exclude_package_data={'': ['tests', 'docs']},
-      python_requires='>=3.6',
+      python_requires='>=3.8',
       install_requires=requirements,
       extras_require={
           "testing": [
@@ -85,8 +85,7 @@ setup(name='tempocnn',
           ]
       },
       classifiers=['Development Status :: 3 - Alpha',
-                   'Programming Language :: Python :: 3.6',
-                   'Programming Language :: Python :: 3.7',
+                   'Programming Language :: Python :: 3.8',
                    'Environment :: Console',
                    'License :: OSI Approved :: GNU Affero General Public License v3',
                    'Topic :: Multimedia :: Sound/Audio :: Analysis',
