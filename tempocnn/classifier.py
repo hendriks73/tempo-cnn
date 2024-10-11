@@ -6,9 +6,9 @@ from pathlib import Path
 from urllib.error import HTTPError
 
 import numpy as np
-from tensorflow.python.keras.models import load_model
+from tensorflow.keras.models import load_model
 
-logger = logging.getLogger('tempocnn.classifier')
+logger = logging.getLogger("tempocnn.classifier")
 
 
 def std_normalizer(data):
@@ -23,8 +23,8 @@ def std_normalizer(data):
     data = data.astype(np.float64)
     mean = np.mean(data)
     std = np.std(data)
-    if std != 0.:
-        data = (data-mean) / std
+    if std != 0.0:
+        data = (data - mean) / std
     return data.astype(np.float16)
 
 
@@ -46,44 +46,49 @@ class TempoClassifier:
     Classifier that can estimate musical tempo in different formats.
     """
 
-    def __init__(self, model_name='fcn'):
+    def __init__(self, model_name="fcn"):
         """
         Initializes this classifier with a Keras model.
 
         :param model_name: model name from sub-package models. E.g. 'fcn', 'cnn', or 'ismir2018'
         """
-        if 'fma' in model_name:
+        if "fma" in model_name:
             # fma model uses log BPM scale
-            factor = 256. / np.log(10)
+            factor = 256.0 / np.log(10)
             self.to_bpm = lambda index: np.exp((index + 435) / factor)
         else:
             self.to_bpm = lambda index: index + 30
 
         # match alias for dt_maz_v fold 0.
-        if model_name == 'mazurka':
-            model_name = 'dt_maz_v_fold0'
+        if model_name == "mazurka":
+            model_name = "dt_maz_v_fold0"
         # match aliases for specific deep/shallow models
-        elif model_name == 'deeptemp':
-            model_name = 'deeptemp_k16'
-        elif model_name == 'shallowtemp':
-            model_name = 'shallowtemp_k6'
-        elif model_name == 'deepsquare':
-            model_name = 'deepsquare_k16'
+        elif model_name == "deeptemp":
+            model_name = "deeptemp_k16"
+        elif model_name == "shallowtemp":
+            model_name = "shallowtemp_k6"
+        elif model_name == "deepsquare":
+            model_name = "deepsquare_k16"
         self.model_name = model_name
 
         # mazurka and deeptemp/shallowtempo models use a different kind of normalization
-        self.normalize = std_normalizer if 'dt_maz' in self.model_name \
-                                           or 'deeptemp' in self.model_name \
-                                           or 'deepsquare' in self.model_name \
-                                           or 'shallowtemp' in self.model_name \
+        self.normalize = (
+            std_normalizer
+            if "dt_maz" in self.model_name
+            or "deeptemp" in self.model_name
+            or "deepsquare" in self.model_name
+            or "shallowtemp" in self.model_name
             else max_normalizer
+        )
 
         resource = _to_model_resource(model_name)
         try:
             file = _extract_from_package(resource)
         except Exception as e:
-            print('Failed to find a model named \'{}\'. Please check the model name.'.format(model_name),
-                  file=sys.stderr)
+            print(
+                f"Failed to find a model named '{model_name}'. Please check the model name.",
+                file=sys.stderr,
+            )
             raise e
         logger.debug(f"Loading model {model_name} from {file}")
         self.model = load_model(file)
@@ -96,10 +101,18 @@ class TempoClassifier:
         :param data: features
         :return: tempo probability distribution
         """
-        assert len(data.shape) == 4, 'Input data must be four dimensional. Actual shape was ' + str(data.shape)
-        assert data.shape[1] == 40, 'Second dim of data must be 40. Actual shape was ' + str(data.shape)
-        assert data.shape[2] == 256, 'Third dim of data must be 256. Actual shape was ' + str(data.shape)
-        assert data.shape[3] == 1, 'Fourth dim of data must be 1. Actual shape was ' + str(data.shape)
+        assert len(data.shape) == 4, (
+            "Input data must be four dimensional. Actual shape was " + str(data.shape)
+        )
+        assert data.shape[1] == 40, (
+            "Second dim of data must be 40. Actual shape was " + str(data.shape)
+        )
+        assert data.shape[2] == 256, (
+            "Third dim of data must be 256. Actual shape was " + str(data.shape)
+        )
+        assert data.shape[3] == 1, (
+            "Fourth dim of data must be 1. Actual shape was " + str(data.shape)
+        )
         norm_data = self.normalize(data)
         return self.model.predict(norm_data, norm_data.shape[0])
 
@@ -118,8 +131,8 @@ class TempoClassifier:
             return x, y[x]
         z = np.polyfit([x - 1, x, x + 1], [y[x - 1], y[x], y[x + 1]], 2)
         # find (float) x value for max
-        argmax = -z[1] / (2. * z[0])
-        height = z[2] - (z[1] ** 2.) / (4. * z[0])
+        argmax = -z[1] / (2.0 * z[0])
+        height = z[2] - (z[1] ** 2.0) / (4.0 * z[0])
         return argmax, height
 
     def estimate_tempo(self, data, interpolate=False):
@@ -158,10 +171,13 @@ class TempoClassifier:
                 height = distribution[index]
                 start = max(index - 5, 0)
                 length = min(11, distribution.shape[0] - start)
-                m = np.max(distribution[start:start + length])
+                m = np.max(distribution[start : start + length])
                 if height == m and index > last_index + 5:
                     if interpolate:
-                        interpolated_index, interpolated_height = self.quad_interpol_argmax(distribution, x=index)
+                        (
+                            interpolated_index,
+                            interpolated_height,
+                        ) = self.quad_interpol_argmax(distribution, x=index)
                         p.append((interpolated_index, interpolated_height))
                     else:
                         p.append((index, height))
@@ -173,19 +189,19 @@ class TempoClassifier:
         peaks = find_index_peaks(averaged_prediction)
 
         if len(peaks) == 0:
-            s1 = 1.
-            t1 = 0.
-            t2 = 0.
+            s1 = 1.0
+            t1 = 0.0
+            t2 = 0.0
         elif len(peaks) == 1:
             bpm = self.to_bpm(peaks[0][0])
             if bpm > 120:
-                alt = bpm/2
-                s1 = 0.
+                alt = bpm / 2
+                s1 = 0.0
                 t1 = alt
                 t2 = bpm
             else:
-                alt = bpm*2
-                s1 = 1.
+                alt = bpm * 2
+                s1 = 1.0
                 t1 = bpm
                 t2 = alt
         else:
@@ -194,11 +210,11 @@ class TempoClassifier:
             alt = self.to_bpm(peaks[1][0])
             alt_height = peaks[1][1]
             if bpm < alt:
-                s1 = bpm_height / (bpm_height+alt_height)
+                s1 = bpm_height / (bpm_height + alt_height)
                 t1 = bpm
                 t2 = alt
             else:
-                s1 = alt_height / (bpm_height+alt_height)
+                s1 = alt_height / (bpm_height + alt_height)
                 t1 = alt
                 t2 = bpm
         return t1, t2, s1
@@ -209,7 +225,7 @@ class MeterClassifier:
     Classifier that can estimate musical meter
     """
 
-    def __init__(self, model_name='fcn'):
+    def __init__(self, model_name="fcn"):
         """
         Initializes this classifier with a Keras model.
 
@@ -218,17 +234,22 @@ class MeterClassifier:
         self._to_meter = lambda index: index + 2
         self.model_name = model_name
         # mazurka and deeptemp/shallowtempo models use a different kind of normalization
-        self.normalize = std_normalizer if 'dt_maz_v' in self.model_name \
-                                           or 'deeptemp' in self.model_name \
-                                           or 'deepsquare' in self.model_name \
-                                           or 'shallowtemp' in self.model_name \
+        self.normalize = (
+            std_normalizer
+            if "dt_maz_v" in self.model_name
+            or "deeptemp" in self.model_name
+            or "deepsquare" in self.model_name
+            or "shallowtemp" in self.model_name
             else max_normalizer
+        )
         resource = _to_model_resource(model_name)
         try:
             file = _extract_from_package(resource)
         except Exception as e:
-            print('Failed to find a model named \'{}\'. Please check the model name.'.format(model_name),
-                  file=sys.stderr)
+            print(
+                f"Failed to find a model named '{model_name}'. Please check the model name.",
+                file=sys.stderr,
+            )
             raise e
         self.model = load_model(file)
 
@@ -240,10 +261,18 @@ class MeterClassifier:
         :param data: features
         :return: meter probability distribution
         """
-        assert len(data.shape) == 4, 'Input data must be four dimensional. Actual shape was ' + str(data.shape)
-        assert data.shape[1] == 40, 'Second dim of data must be 40. Actual shape was ' + str(data.shape)
-        assert data.shape[2] == 512, 'Third dim of data must be 512. Actual shape was ' + str(data.shape)
-        assert data.shape[3] == 1, 'Fourth dim of data must be 1. Actual shape was ' + str(data.shape)
+        assert len(data.shape) == 4, (
+            "Input data must be four dimensional. Actual shape was " + str(data.shape)
+        )
+        assert data.shape[1] == 40, (
+            "Second dim of data must be 40. Actual shape was " + str(data.shape)
+        )
+        assert data.shape[2] == 512, (
+            "Third dim of data must be 512. Actual shape was " + str(data.shape)
+        )
+        assert data.shape[3] == 1, (
+            "Fourth dim of data must be 1. Actual shape was " + str(data.shape)
+        )
         norm_data = self.normalize(data)
         return self.model.predict(norm_data, norm_data.shape[0])
 
@@ -262,28 +291,28 @@ class MeterClassifier:
 
 def _to_model_resource(model_name):
     file = model_name
-    if not model_name.endswith('.h5'):
-        file = file + '.h5'
-    if not file.startswith('models/'):
-        file = 'models/' + file
+    if not model_name.endswith(".h5"):
+        file = file + ".h5"
+    if not file.startswith("models/"):
+        file = "models/" + file
     return file
 
 
 def _extract_from_package(resource):
     # check local cache
-    cache_path = Path(Path.home(), '.tempocnn', resource)
+    cache_path = Path(Path.home(), ".tempocnn", resource)
     if cache_path.exists():
         return str(cache_path)
 
     # ensure cache path exists
     cache_path.parent.mkdir(parents=True, exist_ok=True)
 
-    data = pkgutil.get_data('tempocnn', resource)
+    data = pkgutil.get_data("tempocnn", resource)
     if not data:
         data = _load_model_from_github(resource)
 
     # write to cache
-    with open(cache_path, 'wb') as f:
+    with open(cache_path, "wb") as f:
         f.write(data)
 
     return str(cache_path)
@@ -305,4 +334,6 @@ def _load_model_from_github(resource):
         except Exception:
             pass
 
-        raise FileNotFoundError(f"Failed to download model from {url}: {type(e).__name__}: {e}")
+        raise FileNotFoundError(
+            f"Failed to download model from {url}: {type(e).__name__}: {e}"
+        )

@@ -1,6 +1,7 @@
 """
 tempo-cnn is a simple package that allows estimation of musical tempo.
 """
+
 import logging
 import tensorflow as tf
 

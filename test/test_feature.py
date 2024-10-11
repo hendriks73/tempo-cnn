@@ -9,7 +9,7 @@ from tempocnn.feature import read_features
 @pytest.fixture
 def test_track():
     dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(dir, 'data', 'drumtrack.mp3')
+    return os.path.join(dir, "data", "drumtrack.mp3")
 
 
 def test_init(test_track):

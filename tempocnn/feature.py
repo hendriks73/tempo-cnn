@@ -30,8 +30,16 @@ def read_features(file, frames=256, hop_length=128, zero_pad=False):
     :return: feature tensor for the whole file
     """
     y, sr = librosa.load(file, sr=11025)
-    data = librosa.feature.melspectrogram(y=y, sr=11025, n_fft=1024, hop_length=512,
-                                          power=1, n_mels=40, fmin=20, fmax=5000)
+    data = librosa.feature.melspectrogram(
+        y=y,
+        sr=11025,
+        n_fft=1024,
+        hop_length=512,
+        power=1,
+        n_mels=40,
+        fmin=20,
+        fmax=5000,
+    )
     data = np.reshape(data, (1, data.shape[0], data.shape[1], 1))
 
     # add frames/2 zero frames before and after the data
@@ -50,19 +58,23 @@ def read_features(file, frames=256, hop_length=128, zero_pad=False):
 
 def _ensure_length(data, length):
     padded_data = np.zeros((1, data.shape[1], length, 1), dtype=data.dtype)
-    padded_data[0, :, 0:data.shape[2], 0] = data[0, :, :, 0]
+    padded_data[0, :, 0 : data.shape[2], 0] = data[0, :, :, 0]
     return padded_data
 
 
 def _add_zeros(data, zeros):
-    padded_data = np.zeros((1, data.shape[1], data.shape[2] + zeros, 1), dtype=data.dtype)
-    padded_data[0, :, zeros // 2:data.shape[2] + (zeros // 2), 0] = data[0, :, :, 0]
+    padded_data = np.zeros(
+        (1, data.shape[1], data.shape[2] + zeros, 1), dtype=data.dtype
+    )
+    padded_data[0, :, zeros // 2 : data.shape[2] + (zeros // 2), 0] = data[0, :, :, 0]
     return padded_data
 
 
 def _to_sliding_window(data, window_length, hop_length):
     total_frames = data.shape[2]
     windowed_data = []
-    for offset in range(0, ((total_frames - window_length) // hop_length + 1) * hop_length, hop_length):
-        windowed_data.append(np.copy(data[:, :, offset:window_length + offset, :]))
+    for offset in range(
+        0, ((total_frames - window_length) // hop_length + 1) * hop_length, hop_length
+    ):
+        windowed_data.append(np.copy(data[:, :, offset : window_length + offset, :]))
     return np.concatenate(windowed_data, axis=0)
