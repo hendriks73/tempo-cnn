@@ -85,6 +85,7 @@ class TempoClassifier:
             print('Failed to find a model named \'{}\'. Please check the model name.'.format(model_name),
                   file=sys.stderr)
             raise e
+        logger.debug(f"Loading model {model_name} from {file}")
         self.model = load_model(file)
 
     def estimate(self, data):
