@@ -340,7 +340,7 @@ def tempogram():
         frame_length = (fft_hop_length / sr) * hop_length
 
         fig = plt.figure()
-        fig.canvas.set_window_title('tempogram: ' + file)
+        fig.canvas.manager.set_window_title('tempogram: ' + file)
         if args.png:
             fig.set_size_inches(5, 2)
 

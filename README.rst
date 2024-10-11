@@ -47,7 +47,7 @@ For programmatic use via the Python API, please see `here <#programmatic-usage>`
 Installation
 ============
 
-In a clean Python 3.6 or 3.7 environment, simply run:
+In a clean Python 3.8 environment, simply run:
 
 .. code-block:: console
 
@@ -55,7 +55,7 @@ In a clean Python 3.6 or 3.7 environment, simply run:
 
 
 If you rather want to install from source, clone this repo and run
-``setup.py install`` using Python 3.6 or 3.7:
+``setup.py install`` using Python 3.8:
 
 .. code-block:: console
 
