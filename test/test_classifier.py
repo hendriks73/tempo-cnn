@@ -28,7 +28,6 @@ def test_track():
     'fcn',
     'cnn',
     'ismir2018',
-    'fcn',
     'mazurka',
     'deeptemp',
     'shallowtemp',
@@ -104,9 +103,17 @@ def test_mirex_with_real_data_interpolate(test_track):
     assert t2 == pytest.approx(200.984, abs=0.001)
 
 
-def test_tempo_with_real_data(test_track):
+@pytest.mark.parametrize('model_name', [
+    'cnn',
+    'ismir2018',
+    'fcn',
+    'deeptemp',
+    'shallowtemp',
+    'deepsquare'
+])
+def test_tempo_with_real_data(model_name, test_track):
     features = read_features(test_track)
-    tempo_classifier = TempoClassifier('fcn')
+    tempo_classifier = TempoClassifier(model_name)
     tempo = tempo_classifier.estimate_tempo(features)
     assert tempo == pytest.approx(100.)
 
