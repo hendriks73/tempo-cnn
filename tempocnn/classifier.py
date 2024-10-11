@@ -7,6 +7,7 @@ from urllib.error import HTTPError
 
 import numpy as np
 from tensorflow.keras.models import load_model
+from tempocnn.version import __version__ as package_version
 
 logger = logging.getLogger("tempocnn.classifier")
 
@@ -300,7 +301,7 @@ def _to_model_resource(model_name):
 
 def _extract_from_package(resource):
     # check local cache
-    cache_path = Path(Path.home(), ".tempocnn", resource)
+    cache_path = Path(Path.home(), ".tempocnn", package_version, resource)
     if cache_path.exists():
         return str(cache_path)
 
