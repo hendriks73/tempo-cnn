@@ -4,6 +4,7 @@ Changes
 
 0.0.8:
  - Moved to TensorFlow 2.17.0 and Python 3.9/3.10/3.11.
+ - Made local cache version dependent.
 
 0.0.7:
  - Added DOIs to bibtex entries.
