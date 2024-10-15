@@ -92,7 +92,7 @@ class TempoClassifier:
             )
             raise e
         logger.debug(f"Loading model {model_name} from {file}")
-        self.model = load_model(file)
+        self.model = load_model(file, compile=False)
 
     def estimate(self, data):
         """
