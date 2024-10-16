@@ -308,8 +308,15 @@ def _extract_from_package(resource):
     # ensure cache path exists
     cache_path.parent.mkdir(parents=True, exist_ok=True)
 
-    data = pkgutil.get_data("tempocnn", resource)
-    if not data:
+    data = None
+    try:
+        data = pkgutil.get_data("tempocnn", resource)
+    except FileNotFoundError:
+        pass
+
+    # fallback
+    if data is None:
+        logger.info(f"Resource {resource} not found in package")
         data = _load_model_from_github(resource)
 
     # write to cache
