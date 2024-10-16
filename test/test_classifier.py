@@ -1,4 +1,5 @@
-import os
+# import os
+from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -24,8 +25,7 @@ def test_data():
 
 @pytest.fixture
 def test_track():
-    dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(dir, "data", "drumtrack.mp3")
+    return Path(__file__).absolute().parent / "data" / "drumtrack.mp3"
 
 
 @pytest.mark.parametrize(

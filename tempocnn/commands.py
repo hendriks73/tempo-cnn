@@ -1,7 +1,6 @@
 import argparse
 import sys
-from os import listdir, makedirs
-from os.path import isfile, join, basename, exists, splitext, dirname
+from pathlib import Path
 
 import jams
 import librosa
@@ -192,27 +191,24 @@ def _write_tempo_result(
     :param create_jam: create JAM or not
     """
 
-    file_dir = dirname(input_file)
-    file_name = basename(input_file)
-    if output_dir is not None:
-        file_dir = output_dir
+    file_dir = Path(input_file).parent if output_dir is None else Path(output_dir)
 
     # determine output_file name
     output_file = None
     if create_jam:
-        base, file_extension = splitext(file_name)
-        output_file = join(file_dir, base + ".jams")
+        output_file = file_dir / Path(input_file).with_suffix(".jams").name
     elif append_extension is not None:
-        output_file = join(file_dir, file_name + append_extension)
+        output_file = file_dir / Path(f"{input_file}{append_extension}").name
     elif replace_extension is not None:
-        base, file_extension = splitext(file_name)
-        output_file = join(file_dir, base + replace_extension)
+        if not replace_extension.startswith("."):
+            replace_extension = f".{replace_extension}"
+        output_file = file_dir / Path(input_file).with_suffix(replace_extension).name
     elif output_list is not None and index < len(output_list):
-        output_file = output_list[index]
+        output_file = Path(output_list[index])
 
     # actually writing the output
     if create_jam:
-        result.save(output_file)
+        result.save(str(output_file))
     elif output_file is None:
         print("\n" + result)
     else:
@@ -225,7 +221,7 @@ def _create_tempo_jam(input_file, model, s1, t1, t2):
     y, sr = librosa.load(input_file)
     track_duration = librosa.get_duration(y=y, sr=sr)
     result.file_metadata.duration = track_duration
-    result.file_metadata.identifiers = {"file": basename(input_file)}
+    result.file_metadata.identifiers = {"file": Path(input_file).name}
     tempo_a = jams.Annotation(namespace="tempo", time=0, duration=track_duration)
     tempo_a.annotation_metadata = jams.AnnotationMetadata(
         version=package_version,
@@ -536,9 +532,9 @@ def greekfolk():
     # parse arguments
     args = parser.parse_args()
 
-    if not exists(args.output):
+    if not Path(args.output).exists():
         print("Creating output dir: " + args.output)
-        makedirs(args.output)
+        Path(args.output).mkdir(parents=True, exist_ok=True)
 
     # load models
     print("Loading models...")
@@ -547,22 +543,18 @@ def greekfolk():
 
     print("Processing file(s)...")
 
-    wav_files = [
-        join(args.input, f)
-        for f in listdir(args.input)
-        if f.endswith(".wav") and isfile(join(args.input, f))
-    ]
+    wav_files = [f for f in Path(args.input).glob("*.wav") if f.is_file()]
     if len(wav_files) == 0:
         print("No .wav files found in " + args.input)
     for input_file in wav_files:
-        print("Analyzing: " + input_file)
+        print(f"Analyzing: {input_file}")
         meter_features = read_features(input_file, frames=512, hop_length=256)
         meter_result = str(meter_classifier.estimate_meter(meter_features))
 
         tempo_features = read_features(input_file)
         tempo_result = str(round(tempo_classifier.estimate_tempo(tempo_features), 1))
 
-        output_file = join(args.output, basename(input_file).replace(".wav", ".txt"))
+        output_file = Path(args.output, input_file.with_suffix(".txt").name)
         with open(output_file, mode="w") as f:
             f.write(tempo_result + "\t" + meter_result + "\n")
     print("\nDone")

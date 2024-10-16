@@ -1,5 +1,5 @@
-import os
-from os.path import dirname
+from pathlib import Path
+
 import jams
 
 import pytest
@@ -11,8 +11,7 @@ entry_points = ["tempo", "meter", "tempogram", "greekfolk"]
 
 @pytest.fixture
 def test_track():
-    dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(dir, "data", "drumtrack.mp3")
+    return Path(__file__).absolute().parent / "data" / "drumtrack.mp3"
 
 
 @pytest.mark.parametrize("entry_point", entry_points)
@@ -45,7 +44,7 @@ def test_tempogram(script_runner, test_track):
     ret = script_runner.run(["tempogram", "-p", test_track])
     assert ret.success
     assert "Loading model" in ret.stdout
-    assert os.path.exists(test_track + ".png")
+    assert Path(f"{test_track}.png").exists()
 
 
 def test_meter(script_runner, test_track):
@@ -56,7 +55,7 @@ def test_meter(script_runner, test_track):
 
 
 def test_greekfolk(script_runner, tmpdir, test_track):
-    ret = script_runner.run(["greekfolk", dirname(test_track), str(tmpdir)])
+    ret = script_runner.run(["greekfolk", str(test_track.parent), str(tmpdir)])
     assert ret.success
     assert "No .wav files found in" in ret.stdout
 
@@ -87,9 +86,9 @@ def test_tempo_jams(script_runner, test_track):
     assert ret.success
     assert "Loading model" in ret.stdout
     assert "Processing file" in ret.stdout
-    jams_file = test_track.replace(".mp3", ".jams")
-    assert os.path.exists(jams_file)
-    jam = jams.load(jams_file)
+    jams_file = test_track.with_suffix(".jams")
+    assert jams_file.exists()
+    jam = jams.load(str(jams_file))
 
     annotation = jam.annotations[0]
     assert annotation.duration == pytest.approx(15.046, abs=0.001)
@@ -114,8 +113,8 @@ def test_tempo_jams_and_mirex(script_runner, test_track):
 def test_tempo_extension(script_runner, test_track):
     ret = script_runner.run(["tempo", "-e", ".fancy_pants", "-i", test_track])
     assert ret.success
-    extension_name = test_track + ".fancy_pants"
-    assert os.path.exists(extension_name)
+    extension_name = Path(f"{test_track}.fancy_pants")
+    assert extension_name.exists()
     with open(extension_name, "r") as f:
         assert "100" in f.read()
 
@@ -123,8 +122,8 @@ def test_tempo_extension(script_runner, test_track):
 def test_tempo_replace_extension(script_runner, test_track):
     ret = script_runner.run(["tempo", "-re", ".fancy_pants", "-i", test_track])
     assert ret.success
-    extension_name = test_track.replace(".mp3", ".fancy_pants")
-    assert os.path.exists(extension_name)
+    extension_name = test_track.with_suffix(".fancy_pants")
+    assert extension_name.exists()
     with open(extension_name, "r") as f:
         assert "100" in f.read()
 
