@@ -99,10 +99,10 @@ def tempo():
 
     output_format = parser.add_mutually_exclusive_group()
     output_format.add_argument(
-        "--mirex", help="use MIREX format for output", action="store_true", type=bool
+        "--mirex", help="use MIREX format for output", action="store_true"
     )
     output_format.add_argument(
-        "--jams", help="use JAMS format for output", action="store_true", type=bool
+        "--jams", help="use JAMS format for output", action="store_true"
     )
 
     parser.add_argument(
