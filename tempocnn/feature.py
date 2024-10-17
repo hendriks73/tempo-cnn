@@ -5,11 +5,24 @@ Specifically, tempo-cnn uses mel spectra with 40 bands ranging from
 20 to 5000 Hz.
 """
 
+import os
+from pathlib import Path
+from typing import Union, Any, BinaryIO
+
+import audioread
 import librosa as librosa
 import numpy as np
+import soundfile as sf
 
 
-def read_features(file, frames=256, hop_length=128, zero_pad=False):
+def read_features(
+    file: Union[
+        str, Path, os.PathLike[Any], sf.SoundFile, audioread.AudioFile, BinaryIO
+    ],
+    frames: int = 256,
+    hop_length: int = 128,
+    zero_pad: bool = False,
+) -> np.ndarray:
     """
     Resample file to 11025 Hz, then transform using STFT with length 1024
     and hop size 512. Convert resulting linear spectrum to mel spectrum
@@ -56,13 +69,13 @@ def read_features(file, frames=256, hop_length=128, zero_pad=False):
     return _to_sliding_window(data, frames, hop_length)
 
 
-def _ensure_length(data, length):
+def _ensure_length(data: np.ndarray, length: int) -> np.ndarray:
     padded_data = np.zeros((1, data.shape[1], length, 1), dtype=data.dtype)
     padded_data[0, :, 0 : data.shape[2], 0] = data[0, :, :, 0]
     return padded_data
 
 
-def _add_zeros(data, zeros):
+def _add_zeros(data: np.ndarray, zeros: int) -> np.ndarray:
     padded_data = np.zeros(
         (1, data.shape[1], data.shape[2] + zeros, 1), dtype=data.dtype
     )
@@ -70,7 +83,9 @@ def _add_zeros(data, zeros):
     return padded_data
 
 
-def _to_sliding_window(data, window_length, hop_length):
+def _to_sliding_window(
+    data: np.ndarray, window_length: int, hop_length: int
+) -> np.ndarray:
     total_frames = data.shape[2]
     windowed_data = []
     for offset in range(

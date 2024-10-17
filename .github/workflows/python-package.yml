@@ -34,12 +34,15 @@ jobs:
           sudo apt-get install libsndfile1
           sudo apt-get install ffmpeg
           python -m pip install --upgrade pip setuptools wheel
-          pip install ruff pytest
+          pip install ruff pytest mypy
           pip install .[testing]
       - name: Lint with ruff
         run: |
           ruff check tempocnn test
           ruff format --check tempocnn test
+      - name: Type check with mypy
+        run: |
+          mypy --ignore-missing-imports --check-untyped-defs tempocnn test
       - name: Test with pytest
         run: |
           coverage run --source ./tempocnn -m pytest --verbose --junitxml=pytest_report${{ matrix.python-version }}.xml

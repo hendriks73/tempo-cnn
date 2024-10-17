@@ -1,6 +1,7 @@
 import argparse
 import sys
 from pathlib import Path
+from typing import Union, Optional
 
 import jams
 import librosa
@@ -98,10 +99,10 @@ def tempo():
 
     output_format = parser.add_mutually_exclusive_group()
     output_format.add_argument(
-        "--mirex", help="use MIREX format for output", action="store_true"
+        "--mirex", help="use MIREX format for output", action="store_true", type=bool
     )
     output_format.add_argument(
-        "--jams", help="use JAMS format for output", action="store_true"
+        "--jams", help="use JAMS format for output", action="store_true", type=bool
     )
 
     parser.add_argument(
@@ -132,6 +133,7 @@ def tempo():
             create_jam = args.jams
             create_mirex = args.mirex
 
+            result: Union[str, jams.JAMS]
             if create_mirex or create_jam:
                 t1, t2, s1 = classifier.estimate_mirex(
                     features, interpolate=args.interpolate
@@ -169,14 +171,14 @@ def tempo():
 
 
 def _write_tempo_result(
-    result,
-    input_file=None,
-    output_dir=None,
-    output_list=None,
-    index=0,
-    append_extension=None,
-    replace_extension=None,
-    create_jam=False,
+    result: Union[str, jams.JAMS],
+    input_file: str,
+    output_dir: Optional[str] = None,
+    output_list: Optional[list[str]] = None,
+    index: int = 0,
+    append_extension: Optional[str] = None,
+    replace_extension: Optional[str] = None,
+    create_jam: bool = False,
 ):
     """
     Write the tempo analysis results to a file.
@@ -207,7 +209,7 @@ def _write_tempo_result(
         output_file = Path(output_list[index])
 
     # actually writing the output
-    if create_jam:
+    if create_jam and isinstance(result, jams.JAMS):
         result.save(str(output_file))
     elif output_file is None:
         print("\n" + result)
@@ -216,7 +218,9 @@ def _write_tempo_result(
             file_name.write(result + "\n")
 
 
-def _create_tempo_jam(input_file, model, s1, t1, t2):
+def _create_tempo_jam(
+    input_file: Union[str, Path], model: str, s1: float, t1: float, t2: float
+) -> jams.JAMS:
     result = jams.JAMS()
     y, sr = librosa.load(input_file)
     track_duration = librosa.get_duration(y=y, sr=sr)
@@ -378,7 +382,8 @@ def tempogram():
         frame_length = (fft_hop_length / sr) * hop_length
 
         fig = plt.figure()
-        fig.canvas.manager.set_window_title("tempogram: " + file)
+        if fig.canvas.manager is not None:
+            fig.canvas.manager.set_window_title("tempogram: " + file)
         if args.png:
             fig.set_size_inches(5, 2)
 
@@ -422,7 +427,7 @@ def tempogram():
     print("\nDone")
 
 
-def _norm_tempogram_frames(predictions=None, norm_frame=None):
+def _norm_tempogram_frames(predictions: np.ndarray, norm_frame: str) -> np.ndarray:
     norm_order = np.inf
     if "max" == norm_frame.lower():
         norm_order = np.inf
@@ -439,14 +444,14 @@ def _norm_tempogram_frames(predictions=None, norm_frame=None):
 
 
 def _write_tempogram_as_csv(
-    predictions=None,
-    classifier=None,
-    file=None,
-    frame_length=None,
-    log_scale=False,
-    min_bpm=30,
-    max_bpm=256,
-    sharpen=False,
+    predictions: np.ndarray,
+    classifier: TempoClassifier,
+    file: str,
+    frame_length: int,
+    log_scale: bool = False,
+    min_bpm: int = 30,
+    max_bpm: int = 256,
+    sharpen: bool = False,
 ):
     csv_file_name = file + ".csv"
     if sharpen:
@@ -479,7 +484,7 @@ def _write_tempogram_as_csv(
         )
 
 
-def _get_tempogram_limits(log_scale):
+def _get_tempogram_limits(log_scale: bool) -> tuple[int, int, int]:
     if log_scale:
         min_bpm = 50
         max_bpm = 500

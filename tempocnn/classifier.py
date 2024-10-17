@@ -3,6 +3,7 @@ import pkgutil
 import sys
 import urllib.request
 from pathlib import Path
+from typing import Optional
 from urllib.error import HTTPError
 
 import numpy as np
@@ -12,7 +13,7 @@ from tempocnn.version import __version__ as package_version
 logger = logging.getLogger("tempocnn.classifier")
 
 
-def std_normalizer(data):
+def std_normalizer(data: np.ndarray) -> np.ndarray:
     """
     Normalizes data to zero mean and unit variance.
     Used by Mazurka models.
@@ -29,7 +30,7 @@ def std_normalizer(data):
     return data.astype(np.float16)
 
 
-def max_normalizer(data):
+def max_normalizer(data: np.ndarray) -> np.ndarray:
     """
     Divides by max. Used as normalization by older models.
 
@@ -47,7 +48,7 @@ class TempoClassifier:
     Classifier that can estimate musical tempo in different formats.
     """
 
-    def __init__(self, model_name="fcn"):
+    def __init__(self, model_name: str = "fcn"):
         """
         Initializes this classifier with a Keras model.
 
@@ -94,7 +95,7 @@ class TempoClassifier:
         logger.debug(f"Loading model {model_name} from {file}")
         self.model = load_model(file, compile=False)
 
-    def estimate(self, data):
+    def estimate(self, data: np.ndarray) -> np.ndarray:
         """
         Estimate a tempo distribution.
         Probabilities are indexed, starting with 30 BPM and ending with 286 BPM.
@@ -118,7 +119,9 @@ class TempoClassifier:
         return self.model.predict(norm_data, norm_data.shape[0])
 
     @staticmethod
-    def quad_interpol_argmax(y, x=None):
+    def quad_interpol_argmax(
+        y: np.ndarray, x: Optional[int] = None
+    ) -> tuple[float, float]:
         """
         Find argmax for quadratic interpolation around argmax of y.
 
@@ -127,16 +130,16 @@ class TempoClassifier:
         :return: float (index) of interpolated max, strength
         """
         if x is None:
-            x = np.argmax(y)
+            x = int(np.argmax(y))
         if x == 0 or x == y.shape[0] - 1:
-            return x, y[x]
+            return float(x), float(y[x])
         z = np.polyfit([x - 1, x, x + 1], [y[x - 1], y[x], y[x + 1]], 2)
         # find (float) x value for max
         argmax = -z[1] / (2.0 * z[0])
         height = z[2] - (z[1] ** 2.0) / (4.0 * z[0])
-        return argmax, height
+        return float(argmax), float(height)
 
-    def estimate_tempo(self, data, interpolate=False):
+    def estimate_tempo(self, data: np.ndarray, interpolate: bool = False) -> float:
         """
         Estimates the pre-dominant global tempo.
 
@@ -150,10 +153,12 @@ class TempoClassifier:
         if interpolate:
             index, _ = self.quad_interpol_argmax(averaged_prediction)
         else:
-            index = np.argmax(averaged_prediction)
+            index = int(np.argmax(averaged_prediction))
         return self.to_bpm(index)
 
-    def estimate_mirex(self, data, interpolate=False):
+    def estimate_mirex(
+        self, data: np.ndarray, interpolate: bool = False
+    ) -> tuple[float, float, float]:
         """
         Estimates the two dominant tempi along with a salience value.
 
@@ -165,8 +170,8 @@ class TempoClassifier:
 
         prediction = self.estimate(data)
 
-        def find_index_peaks(distribution):
-            p = []
+        def find_index_peaks(distribution: np.ndarray) -> list[tuple[float, float]]:
+            p: list[tuple[float, float]] = []
             last_index = 0
             for index in range(256):
                 height = distribution[index]
@@ -181,13 +186,17 @@ class TempoClassifier:
                         ) = self.quad_interpol_argmax(distribution, x=index)
                         p.append((interpolated_index, interpolated_height))
                     else:
-                        p.append((index, height))
+                        p.append((float(index), float(height)))
                     last_index = index
             # sort peaks by height, descending
             return sorted(p, key=lambda element: element[1], reverse=True)
 
         averaged_prediction = np.average(prediction, axis=0)
         peaks = find_index_peaks(averaged_prediction)
+
+        s1: float
+        t1: float
+        t2: float
 
         if len(peaks) == 0:
             s1 = 1.0
@@ -226,7 +235,7 @@ class MeterClassifier:
     Classifier that can estimate musical meter
     """
 
-    def __init__(self, model_name="fcn"):
+    def __init__(self, model_name: str = "fcn"):
         """
         Initializes this classifier with a Keras model.
 
@@ -254,7 +263,7 @@ class MeterClassifier:
             raise e
         self.model = load_model(file)
 
-    def estimate(self, data):
+    def estimate(self, data: np.ndarray) -> np.ndarray:
         """
         Estimate a meter distribution.
         Probabilities are indexed, starting with 2. Only the meter numerator is given (e.g. 2 for 2/4).
@@ -277,7 +286,7 @@ class MeterClassifier:
         norm_data = self.normalize(data)
         return self.model.predict(norm_data, norm_data.shape[0])
 
-    def estimate_meter(self, data):
+    def estimate_meter(self, data: np.ndarray) -> int:
         """
         Estimates the pre-dominant global meter.
 
@@ -290,7 +299,7 @@ class MeterClassifier:
         return self._to_meter(index)
 
 
-def _to_model_resource(model_name):
+def _to_model_resource(model_name: str) -> str:
     file = model_name
     if not model_name.endswith(".h5"):
         file = file + ".h5"
@@ -299,7 +308,7 @@ def _to_model_resource(model_name):
     return file
 
 
-def _extract_from_package(resource):
+def _extract_from_package(resource: str) -> str:
     # check local cache
     cache_path = Path(Path.home(), ".tempocnn", package_version, resource)
     if cache_path.exists():
@@ -326,7 +335,7 @@ def _extract_from_package(resource):
     return str(cache_path)
 
 
-def _load_model_from_github(resource):
+def _load_model_from_github(resource: str):
     url = f"https://raw.githubusercontent.com/hendriks73/tempo-cnn/main/tempocnn/{resource}"
     logger.info(f"Attempting to download model file from main branch {url}")
     try:
