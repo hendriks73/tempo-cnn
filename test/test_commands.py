@@ -78,7 +78,7 @@ def test_tempo_mirex(script_runner, test_track):
     ret = script_runner.run(["tempo", "--mirex", "-i", test_track])
     assert ret.success
     assert "Loading model" in ret.stdout
-    assert "100	201	0.99" in ret.stdout
+    assert "100.0	201.0	0.99" in ret.stdout
 
 
 def test_tempo_jams(script_runner, test_track):
